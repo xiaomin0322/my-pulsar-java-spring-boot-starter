@@ -13,7 +13,8 @@ public class PulsarTemplate<T> {
         this.producerCollector = producerCollector;
     }
 
-    public MessageId send(String topic, T msg) throws PulsarClientException {
+    @SuppressWarnings("unchecked")
+	public MessageId send(String topic, T msg) throws PulsarClientException {
         //noinspection unchecked
         return producerCollector.getProducers().get(topic).send(msg);
     }

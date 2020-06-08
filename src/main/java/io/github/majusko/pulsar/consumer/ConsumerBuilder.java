@@ -6,6 +6,7 @@ import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.PulsarClient;
 import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.Schema;
+import org.apache.pulsar.client.api.SubscriptionType;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +40,7 @@ public class ConsumerBuilder {
         try {
             return pulsarClient
                 .newConsumer(Schema.JSON(holder.getAnnotation().clazz()))
+                .subscriptionType(SubscriptionType.Failover)
                 .consumerName("consumer-" + name)
                 .subscriptionName("subscription-" + name)
                 .topic(holder.getAnnotation().topic())
@@ -47,7 +49,7 @@ public class ConsumerBuilder {
                         final Method method = holder.getHandler();
 
                         method.setAccessible(true);
-                        method.invoke(holder.getBean(), msg);
+                        method.invoke(holder.getBean(), msg.getValue());
 
                         consumer.acknowledge(msg);
                     } catch (Exception e) {

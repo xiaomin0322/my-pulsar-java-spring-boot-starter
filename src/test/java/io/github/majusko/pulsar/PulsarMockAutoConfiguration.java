@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class PulsarMockAutoConfiguration {
 
-    @Bean
+    /*@Bean
     public PulsarClient pulsarClient() {
         return new MockPulsarClient();
-    }
+    }*/
 }
