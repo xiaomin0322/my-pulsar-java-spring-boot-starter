@@ -17,7 +17,6 @@ import org.springframework.util.CollectionUtils;
 
 import io.github.majusko.pulsar.annotation.PulsarConsumer;
 import io.github.majusko.pulsar.collector.ConsumerCollector;
-import io.github.majusko.pulsar.collector.ConsumerHolder;
 import io.github.majusko.pulsar.config.ConsumerConfigManage;
 
 @Component
@@ -47,9 +46,10 @@ public class ConsumerBuilder {
 	private Consumer<?> subscribe(String name, ConsumerHolder holder) {
 		try {
 			PulsarConsumer annotation = holder.getAnnotation();
-			Map<String, Object> config = consumerConfigManage.getConfig(annotation.topic());
+			Schema<?> schema = Schema.JSON(holder.getAnnotation().clazz());
+			
 			org.apache.pulsar.client.api.ConsumerBuilder<?> consumerBuilder = pulsarClient
-					.newConsumer(Schema.JSON(holder.getAnnotation().clazz()))
+					.newConsumer(schema)
 					.subscriptionType(annotation.subscriptionType()).consumerName("consumer-" + name)
 					.subscriptionName("subscription-" + name).topic(holder.getAnnotation().topic())
 					.messageListener((consumer, msg) -> {
@@ -65,7 +65,7 @@ public class ConsumerBuilder {
 							throw new RuntimeException("TODO Custom Exception!", e);
 						}
 					});
-
+			Map<String, Object> config = consumerConfigManage.getConfig(annotation.topic());
 			if (!CollectionUtils.isEmpty(config)) {
 				consumerBuilder.loadConf(config);
 			}

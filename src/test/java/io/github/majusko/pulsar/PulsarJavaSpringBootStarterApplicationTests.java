@@ -18,11 +18,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import io.github.majusko.pulsar.collector.ConsumerCollector;
-import io.github.majusko.pulsar.collector.ConsumerHolder;
-import io.github.majusko.pulsar.collector.ProducerHolder;
 import io.github.majusko.pulsar.constant.Serialization;
 import io.github.majusko.pulsar.consumer.ConsumerBuilder;
+import io.github.majusko.pulsar.consumer.ConsumerHolder;
 import io.github.majusko.pulsar.producer.ProducerFactory;
+import io.github.majusko.pulsar.producer.ProducerHolder;
 import io.github.majusko.pulsar.producer.PulsarTemplate;
 
 @SpringBootTest

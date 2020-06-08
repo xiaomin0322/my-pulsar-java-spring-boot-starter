@@ -4,6 +4,8 @@ import org.apache.pulsar.client.api.MessageId;
 import org.apache.pulsar.client.api.PulsarClientException;
 import org.springframework.stereotype.Component;
 
+import io.github.majusko.pulsar.collector.ProducerCollector;
+
 @Component
 public class PulsarTemplate<T> {
 

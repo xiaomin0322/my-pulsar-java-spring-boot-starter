@@ -1,4 +1,4 @@
-package io.github.majusko.pulsar.producer;
+package io.github.majusko.pulsar.collector;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,12 +11,14 @@ import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.Schema;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import io.github.majusko.pulsar.annotation.PulsarProducer;
-import io.github.majusko.pulsar.collector.ProducerHolder;
 import io.github.majusko.pulsar.config.ProducerConfigManage;
 import io.github.majusko.pulsar.config.ProducerConfigurationDataExt;
 import io.github.majusko.pulsar.constant.Serialization;
+import io.github.majusko.pulsar.producer.ProducerHolder;
+import io.github.majusko.pulsar.producer.PulsarProducerFactory;
 
 @Component
 public class ProducerCollector implements BeanPostProcessor {
@@ -39,7 +41,7 @@ public class ProducerCollector implements BeanPostProcessor {
 
 		if (beanClass.isAnnotationPresent(PulsarProducer.class) && bean instanceof PulsarProducerFactory) {
 			producers.putAll(((PulsarProducerFactory) bean).getTopics().values().stream()
-					.collect(Collectors.toMap(ProducerHolder::getTopic, this::buildProducer)));
+					.collect(Collectors.toMap(ProducerHolder::getTopicName, this::buildProducer)));
 		}
 
 		return bean;
@@ -52,27 +54,16 @@ public class ProducerCollector implements BeanPostProcessor {
 
 	private Producer<?> buildProducer(ProducerHolder holder) {
 		try {
-			ProducerConfigurationDataExt producerConfigurationDataExt = holder.getConfigurationDataExt();
-			Schema<?> schema = getSchema(holder);
+			Schema<?> schema = holder.getSchema();
 			ProducerBuilder<?> newProducer = pulsarClient.newProducer(schema);
-			if (producerConfigurationDataExt != null) {
-				Map<String, Object> config = producerConfigurationDataExt.toMap();
-				newProducer.loadConf(config);
-			} else {
-				Map<String, Object> config = producerConfigManage.getConfig(holder.getTopic());
+			Map<String, Object> config = producerConfigManage.getConfig(holder.getTopicName());
+			if (!CollectionUtils.isEmpty(config)) {
 				newProducer.loadConf(config);
 			}
-			return newProducer.topic(holder.getTopic()).create();
+			return newProducer.topic(holder.getTopicName()).create();
 		} catch (PulsarClientException e) {
 			throw new RuntimeException("TODO Custom Exception!", e);
 		}
-	}
-
-	private <T> Schema<?> getSchema(ProducerHolder holder) throws RuntimeException {
-		if (holder.getSerialization().equals(Serialization.JSON)) {
-			return Schema.JSON(holder.getClazz());
-		}
-		throw new RuntimeException("TODO custom runtime exception");
 	}
 
 	@SuppressWarnings("rawtypes")

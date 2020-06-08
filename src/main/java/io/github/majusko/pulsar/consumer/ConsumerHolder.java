@@ -1,4 +1,4 @@
-package io.github.majusko.pulsar.collector;
+package io.github.majusko.pulsar.consumer;
 
 import io.github.majusko.pulsar.annotation.PulsarConsumer;
 

@@ -1,6 +1,8 @@
 package io.github.majusko.pulsar.collector;
 
 import io.github.majusko.pulsar.annotation.PulsarConsumer;
+import io.github.majusko.pulsar.consumer.ConsumerHolder;
+
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
@@ -26,7 +28,7 @@ public class ConsumerCollector implements BeanPostProcessor {
                 method -> beanClass.getName() + "#" + method.getName(),
                 method -> new ConsumerHolder(method.getAnnotation(PulsarConsumer.class), method, bean))));
 
-        System.out.println(consumers.toString());
+        //System.out.println(consumers.toString());
 
         return bean;
     }
