@@ -18,8 +18,8 @@ public class TestConsumerConfiguration {
         Assertions.assertNotNull(myMsg);
     }*/
     
-    //@PulsarConsumer(topic = "topic-zzm", clazz = MyMsg.class, serialization = Serialization.JSON)
-    @PulsarConsumer
+    @PulsarConsumer(topic = "topic-zzm", clazz = MyMsg.class, serialization = Serialization.JSON)
+    //@PulsarConsumer(clazz=MyMsg.class)
     public void topicOneTheListener(MyMsg myMsg) {
     	System.out.println("============================="+myMsg.getData());
         Assertions.assertNotNull(myMsg);
