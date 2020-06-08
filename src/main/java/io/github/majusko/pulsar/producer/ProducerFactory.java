@@ -5,6 +5,7 @@ import java.util.Map;
 
 import io.github.majusko.pulsar.annotation.PulsarProducer;
 import io.github.majusko.pulsar.collector.ProducerHolder;
+import io.github.majusko.pulsar.config.ProducerConfigurationDataExt;
 import io.github.majusko.pulsar.constant.Serialization;
 
 @PulsarProducer

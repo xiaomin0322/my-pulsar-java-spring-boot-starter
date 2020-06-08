@@ -1,7 +1,7 @@
 package io.github.majusko.pulsar.collector;
 
+import io.github.majusko.pulsar.config.ProducerConfigurationDataExt;
 import io.github.majusko.pulsar.constant.Serialization;
-import io.github.majusko.pulsar.producer.ProducerConfigurationDataExt;
 
 public class ProducerHolder {
 

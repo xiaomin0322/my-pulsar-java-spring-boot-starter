@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import io.github.majusko.pulsar.annotation.PulsarProducer;
 import io.github.majusko.pulsar.collector.ProducerHolder;
+import io.github.majusko.pulsar.config.ProducerConfigManage;
+import io.github.majusko.pulsar.config.ProducerConfigurationDataExt;
 import io.github.majusko.pulsar.constant.Serialization;
 
 @Component
@@ -21,11 +23,14 @@ public class ProducerCollector implements BeanPostProcessor {
 
 	private final PulsarClient pulsarClient;
 
+	private ProducerConfigManage producerConfigManage;
+
 	@SuppressWarnings("rawtypes")
 	private Map<String, Producer> producers = new ConcurrentHashMap<>();
 
-	public ProducerCollector(PulsarClient pulsarClient) {
+	public ProducerCollector(PulsarClient pulsarClient, ProducerConfigManage producerConfigManage) {
 		this.pulsarClient = pulsarClient;
+		this.producerConfigManage = producerConfigManage;
 	}
 
 	@Override
@@ -51,8 +56,11 @@ public class ProducerCollector implements BeanPostProcessor {
 			Schema<?> schema = getSchema(holder);
 			ProducerBuilder<?> newProducer = pulsarClient.newProducer(schema);
 			if (producerConfigurationDataExt != null) {
-				Map<String, Object> map = producerConfigurationDataExt.toMap();
-				newProducer.loadConf(map);
+				Map<String, Object> config = producerConfigurationDataExt.toMap();
+				newProducer.loadConf(config);
+			} else {
+				Map<String, Object> config = producerConfigManage.getConfig(holder.getTopic());
+				newProducer.loadConf(config);
 			}
 			return newProducer.topic(holder.getTopic()).create();
 		} catch (PulsarClientException e) {

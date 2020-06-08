@@ -1,4 +1,4 @@
-package io.github.majusko.pulsar.producer;
+package io.github.majusko.pulsar.config;
 
 import java.io.IOException;
 import java.util.Map;

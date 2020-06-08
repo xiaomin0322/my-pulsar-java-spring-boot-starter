@@ -2,9 +2,9 @@ package io.github.majusko.pulsar;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "pulsar")
+@ConfigurationProperties(prefix = "pulsar.client")
 public class PulsarProperties {
-    private String serviceUrl = "pulsar://localhost:6650";
+    private String  serviceUrl = "pulsar://localhost:6650";
     private Integer ioThreads = 10;
     private Integer listenerThreads = 10;
     private boolean enableTcpNoDelay = false;
