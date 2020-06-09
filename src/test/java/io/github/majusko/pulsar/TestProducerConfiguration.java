@@ -10,7 +10,7 @@ import io.github.majusko.pulsar.producer.ProducerHolder;
 @Configuration
 public class TestProducerConfiguration {
 
-	@Bean
+	//@Bean
 	public ProducerFactory producerFactory() {
 
 		ProducerHolder configurationDataExt = new ProducerHolder();

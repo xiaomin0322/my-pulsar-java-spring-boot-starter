@@ -10,6 +10,7 @@ import org.apache.pulsar.client.api.PulsarClient;
 import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.Schema;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import io.github.majusko.pulsar.annotation.PulsarProducer;
@@ -18,9 +19,11 @@ import io.github.majusko.pulsar.producer.ProducerHolder;
 import io.github.majusko.pulsar.producer.PulsarProducerFactory;
 import io.github.majusko.pulsar.producer.SendMessage;
 import io.github.majusko.pulsar.util.ConfigurationDataUtils;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
-public class ProducerCollector implements BeanPostProcessor {
+@Slf4j
+public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 
 	private final PulsarClient pulsarClient;
 
@@ -86,5 +89,11 @@ public class ProducerCollector implements BeanPostProcessor {
 	@SuppressWarnings("rawtypes")
 	public Map<String, Producer> getProducers() {
 		return producers;
+	}
+
+	@Override
+	public void run(String... args) throws Exception {
+		log.info("producers {} ",producers.keySet());
+		
 	}
 }
