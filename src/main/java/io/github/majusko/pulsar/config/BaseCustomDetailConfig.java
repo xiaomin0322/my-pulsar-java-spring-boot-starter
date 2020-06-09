@@ -15,8 +15,9 @@ public class BaseCustomDetailConfig {
 	public BaseCustomDetailConfig() {
 	}
 
-	public Schema<?> getSchema() {
-		Schema<?> schema = Schema.JSON(clazz);
+	
+	public Schema<?> schema() {
+		Schema<?> schema = Schema.JSON(getClazz());
 		return schema;
 	}
 }

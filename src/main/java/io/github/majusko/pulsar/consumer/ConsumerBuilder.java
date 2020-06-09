@@ -45,15 +45,14 @@ public class ConsumerBuilder {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Consumer<?> subscribe(String name, ConsumerHolder holder) {
 		try {
-			Schema<?> schema = holder.getSchema();
+			Schema<?> schema = holder.schema();
 			org.apache.pulsar.client.api.ConsumerBuilder<?> consumerBuilder = pulsarClient.newConsumer(schema);
-			ConsumerConfigurationDataExt config = consumerCollector.getConsumerCustomDetailConfigMap()
-					.get(holder.getTopic());
+			ConsumerConfigurationDataExt config = consumerCollector.getConsumerConfigurationDataExt(holder.getTopic());
 			if (config != null) {
 				consumerBuilder = consumerBuilder
 						.loadConf(ConfigurationDataUtils.toMap(config, ConsumerConfigurationDataExt.class));
 			}
-			consumerBuilder.messageListener(new ConsumerMessageListener(holder));
+			consumerBuilder = consumerBuilder.messageListener(new ConsumerMessageListener(holder));
 			log.info("consumer : {} subscribed ", name);
 			return consumerBuilder.subscribe();
 		} catch (PulsarClientException e) {

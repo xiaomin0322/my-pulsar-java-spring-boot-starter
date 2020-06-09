@@ -1,8 +1,5 @@
 package io.github.majusko.pulsar.config;
 
-import org.apache.pulsar.client.api.Schema;
-
-import io.github.majusko.pulsar.constant.Serialization;
 import lombok.Data;
 
 /**
@@ -14,21 +11,16 @@ import lombok.Data;
 @Data
 public class ProducerCustomDetailConfig extends BaseCustomDetailConfig {
 
-	private String topic;
-	private Class<?> clazz;
-	private Serialization serialization = Serialization.JSON;
 	private ProducerConfigurationDataExt config;
 
 	public ProducerCustomDetailConfig() {
 	}
 
 	public ProducerConfigurationDataExt getConfig() {
-		config.setTopicName(topic);
+	    if(config!=null) {
+	    	config.setTopicName(getTopic());
+	    }	
 		return config;
 	}
 
-	public Schema<?> getSchema() {
-		Schema<?> schema = Schema.JSON(clazz);
-		return schema;
-	}
 }

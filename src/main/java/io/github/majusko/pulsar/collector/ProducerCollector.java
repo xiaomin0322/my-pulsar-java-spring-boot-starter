@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import io.github.majusko.pulsar.annotation.PulsarProducer;
+import io.github.majusko.pulsar.config.ConsumerConfigurationDataExt;
 import io.github.majusko.pulsar.config.ProducerConfigurationDataExt;
 import io.github.majusko.pulsar.config.ProducerCustomConfig;
 import io.github.majusko.pulsar.config.ProducerCustomDetailConfig;
@@ -50,6 +51,20 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 		return bean;
 	}
 
+	@SuppressWarnings("rawtypes")
+	public Producer getProducer(String topic) {
+		return getProducerMap().get(topic);
+	}
+
+	public void init() {
+		//覆盖 spring bean 配置得对象
+		Map<String, ProducerCustomDetailConfig> producersMap = producerCustomConfig.getProducer();
+		if (!CollectionUtils.isEmpty(producersMap)) {
+			producers.putAll(producersMap.values().stream()
+					.collect(Collectors.toMap(ProducerCustomDetailConfig::getTopic, this::buildProducer)));
+		}
+	}
+
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		return bean;
@@ -57,7 +72,7 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 
 	private Producer<?> buildProducer(ProducerCustomDetailConfig holder) {
 		try {
-			Schema<?> schema = holder.getSchema();
+			Schema<?> schema = holder.schema();
 			ProducerBuilder<?> newProducer = pulsarClient.newProducer(schema);
 			ProducerConfigurationDataExt config = holder.getConfig();
 			if (config != null) {
@@ -76,10 +91,12 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 
 	@SuppressWarnings("rawtypes")
 	public <T> Producer getProducer(String topic, SendMessage<T> msg, ProducerCustomDetailConfig config) {
-		Producer producer = producers.get(topic);
-		;
+		Producer producer = getProducer(topic);
 		if (producer != null) {
 			return producer;
+		}
+		if(config == null) {
+			//config = ProducerHolder.getDef();
 		}
 		producer = buildProducer(config);
 		producers.put(topic, producer);
@@ -87,19 +104,21 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public Map<String, Producer> getProducers() {
+	public Map<String, Producer> getProducerMap() {
+		if (!CollectionUtils.isEmpty(producers)) {
+			return producers;
+		}
+		synchronized (producers) {
+			if (!CollectionUtils.isEmpty(producers)) {
+				return producers;
+			}
+			init();
+		}
 		return producers;
 	}
 
 	@Override
 	public void run(String... args) throws Exception {
-
-		Map<String, ProducerCustomDetailConfig> producersMap = producerCustomConfig.getProducer();
-		if (!CollectionUtils.isEmpty(producersMap)) {
-			producers.putAll(producersMap.values().stream()
-					.collect(Collectors.toMap(ProducerCustomDetailConfig::getTopic, this::buildProducer)));
-		}
-
 		log.info("producers topic keys {} ", producers.keySet());
 
 	}
