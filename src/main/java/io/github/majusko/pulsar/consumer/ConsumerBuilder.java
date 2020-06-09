@@ -49,11 +49,10 @@ public class ConsumerBuilder {
 					.messageListener((consumer, msg) -> {
 						try {
 							final Method method = holder.getHandler();
-
 							Class<?> returnType = method.getReturnType();
 							Object value = msg.getValue();
 							if (!returnType.equals(value.getClass())) {
-								value = msg;
+								value = ConsumeMessage.parse(msg);
 							}
 							method.setAccessible(true);
 							method.invoke(holder.getBean(), msg.getValue());

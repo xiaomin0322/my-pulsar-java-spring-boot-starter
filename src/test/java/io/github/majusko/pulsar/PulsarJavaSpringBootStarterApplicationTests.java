@@ -5,9 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.pulsar.client.api.Consumer;
-import org.apache.pulsar.client.api.MessageId;
 import org.apache.pulsar.client.api.PulsarClientException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -18,12 +16,13 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import io.github.majusko.pulsar.collector.ConsumerCollector;
-import io.github.majusko.pulsar.constant.Serialization;
 import io.github.majusko.pulsar.consumer.ConsumerBuilder;
 import io.github.majusko.pulsar.consumer.ConsumerHolder;
 import io.github.majusko.pulsar.producer.ProducerFactory;
 import io.github.majusko.pulsar.producer.ProducerHolder;
 import io.github.majusko.pulsar.producer.PulsarTemplate;
+import io.github.majusko.pulsar.producer.SendMessage;
+import io.github.majusko.pulsar.producer.SendResult;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -54,14 +53,15 @@ class PulsarJavaSpringBootStarterApplicationTests {
 
 	@Test
 	void testProducerSendMethod2() throws PulsarClientException {
-		MessageId send = producer.send("topic-zzm", new MyMsg("bb"));
-		System.out.println("=========" + send.toString());
+		SendMessage<MyMsg> message = new SendMessage<>();
+		SendResult send = producer.send("topic-zzm", message);
+		System.out.println("=========" + send.getMsgId());
 	}
 
 	@Test
 	void testProducerSendMethod() throws PulsarClientException {
-		MessageId send = producer.send("topic-one", new MyMsg("bb"));
-		System.out.println("=========" + send.toString());
+		//MessageId send = producer.send("topic-one", new MyMsg("bb"));
+		//System.out.println("=========" + send.toString());
 	}
 
 	@Test

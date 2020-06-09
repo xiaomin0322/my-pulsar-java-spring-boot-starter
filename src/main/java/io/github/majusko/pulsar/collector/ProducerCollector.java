@@ -16,6 +16,7 @@ import io.github.majusko.pulsar.annotation.PulsarProducer;
 import io.github.majusko.pulsar.config.ProducerConfigurationDataExt;
 import io.github.majusko.pulsar.producer.ProducerHolder;
 import io.github.majusko.pulsar.producer.PulsarProducerFactory;
+import io.github.majusko.pulsar.producer.SendMessage;
 import io.github.majusko.pulsar.util.ConfigurationDataUtils;
 
 @Component
@@ -33,12 +34,10 @@ public class ProducerCollector implements BeanPostProcessor {
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) {
 		final Class<?> beanClass = bean.getClass();
-
 		if (beanClass.isAnnotationPresent(PulsarProducer.class) && bean instanceof PulsarProducerFactory) {
 			producers.putAll(((PulsarProducerFactory) bean).getTopics().values().stream()
 					.collect(Collectors.toMap(ProducerHolder::getTopic, this::buildProducer)));
 		}
-
 		return bean;
 	}
 
@@ -62,12 +61,12 @@ public class ProducerCollector implements BeanPostProcessor {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public <T> Producer getProducer(String topic, T t) {
-		return getProducer(topic, t, null);
+	public <T> Producer getProducer(String topic, SendMessage<T> msg) {
+		return getProducer(topic, msg, null);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public <T> Producer getProducer(String topic, T t, ProducerConfigurationDataExt config) {
+	public <T> Producer getProducer(String topic, SendMessage<T> msg, ProducerConfigurationDataExt config) {
 		Producer producer = producers.get(topic);
 		;
 		if (producer != null) {
@@ -75,7 +74,7 @@ public class ProducerCollector implements BeanPostProcessor {
 		}
 		ProducerHolder producerHolder = new ProducerHolder();
 		producerHolder.setTopic(topic);
-		producerHolder.setClazz(t.getClass());
+		producerHolder.setClazz(msg.getValue().getClass());
 		if (config != null) {
 			producerHolder.setConfig(config);
 		}
