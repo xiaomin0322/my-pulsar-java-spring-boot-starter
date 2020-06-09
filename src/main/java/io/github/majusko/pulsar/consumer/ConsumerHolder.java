@@ -34,7 +34,7 @@ public class ConsumerHolder {
 		return configurationDataExt;
 	}
 
-	public ConsumerConfigurationDataExt getConsumerConfigurationDataExt() {
+	public ConsumerConfigurationDataExt getConfig() {
 		ConsumerConfigurationDataExt def = getDef();
 		if (annotation == null || ArrayUtils.isEmpty(annotation.configuration())) {
 			return def;

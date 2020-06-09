@@ -47,7 +47,9 @@ public class ConsumerConfigManage {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Set<String> getKeySet() {
 		ConsumerConfigurationDataExt configurationData = new ConsumerConfigurationDataExt();
-		return configurationData.toMap().keySet();
+		return null;
+		//return configurationData.toMap().keySet();
+		
 	}
 
 }

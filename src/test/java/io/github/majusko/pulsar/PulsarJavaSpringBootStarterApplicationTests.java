@@ -40,7 +40,7 @@ class PulsarJavaSpringBootStarterApplicationTests {
 	private ProducerFactory producerFactory;
 
 	@Autowired
-	private PulsarTemplate<MyMsg> producer;
+	private PulsarTemplate producer;
 
 	@Test
 	void testConsumer() throws PulsarClientException {

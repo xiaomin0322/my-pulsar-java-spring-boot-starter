@@ -13,12 +13,12 @@ public class TestProducerConfiguration {
 	@Bean
 	public ProducerFactory producerFactory() {
 
-		ProducerHolder configurationDataExt = new ProducerHolder();
+		/*ProducerHolder configurationDataExt = new ProducerHolder();
 		configurationDataExt.setTopicName("topic-zzm");
 		configurationDataExt.setSendTimeoutMs(10000);
 		configurationDataExt.setClacc(MyMsg2.class);
 
 		return new ProducerFactory().addProducer("topic-one", MyMsg.class)
-				.addProducer("topic-two", MyMsg2.class, Serialization.JSON).addProducer("topic-zzm", MyMsg2.class);
+				.addProducer("topic-two", MyMsg2.class, Serialization.JSON).addProducer("topic-zzm", MyMsg2.class);*/
 	}
 }

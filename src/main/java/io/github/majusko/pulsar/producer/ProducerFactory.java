@@ -16,26 +16,26 @@ public class ProducerFactory implements PulsarProducerFactory {
 
 	public ProducerFactory addProducer(String topic, Class<?> clacc) {
 		ProducerHolder producerHolder = new ProducerHolder();
-		producerHolder.setTopicName(topic);
-		producerHolder.setClacc(clacc);
+		producerHolder.setTopic(topic);
+		producerHolder.setClazz(clacc);
 		topics.put(topic, producerHolder);
 		return this;
 	}
 
 	public ProducerFactory addProducer(String topic, Class<?> clacc, Serialization serialization) {
 		ProducerHolder producerHolder = new ProducerHolder();
-		producerHolder.setTopicName(topic);
-		producerHolder.setClacc(clacc);
+		producerHolder.setTopic(topic);
+		producerHolder.setClazz(clacc);
 		producerHolder.setSerialization(serialization);
 		topics.put(topic, producerHolder);
 		return this;
 	}
 
-	public ProducerFactory addProducer(ProducerHolder configurationData) {
-		if (configurationData == null) {
+	public ProducerFactory addProducer(ProducerHolder holder) {
+		if (holder == null) {
 			return this;
 		}
-		topics.put(configurationData.getTopicName(), configurationData);
+		topics.put(holder.getTopic(), holder);
 		return this;
 	}
 

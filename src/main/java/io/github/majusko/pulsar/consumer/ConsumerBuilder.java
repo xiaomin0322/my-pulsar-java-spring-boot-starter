@@ -65,7 +65,7 @@ public class ConsumerBuilder {
 						}
 					});
 
-			ConsumerConfigurationDataExt config = holder.getConsumerConfigurationDataExt();
+			ConsumerConfigurationDataExt config = holder.getConfig();
 			if (config != null) {
 				consumerBuilder.loadConf(ConfigurationDataUtils.toMap(config, ConsumerConfigurationDataExt.class));
 			}
