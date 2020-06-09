@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 
 import io.github.majusko.pulsar.annotation.PulsarConsumer;
@@ -15,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @Slf4j
-public class ConsumerCollector implements BeanPostProcessor {
+public class ConsumerCollector implements BeanPostProcessor, CommandLineRunner {
 
 	private Map<String, ConsumerHolder> consumers = new ConcurrentHashMap<>();
 
@@ -27,9 +28,6 @@ public class ConsumerCollector implements BeanPostProcessor {
 				.filter($ -> $.isAnnotationPresent(PulsarConsumer.class))
 				.collect(Collectors.toMap(method -> beanClass.getName() + "#" + method.getName(),
 						method -> new ConsumerHolder(method.getAnnotation(PulsarConsumer.class), method, bean))));
-
-		log.info("consumers keys {}", consumers.keySet());
-
 		return bean;
 	}
 
@@ -44,5 +42,10 @@ public class ConsumerCollector implements BeanPostProcessor {
 
 	public Optional<ConsumerHolder> getConsumer(String methodDescriptor) {
 		return Optional.ofNullable(consumers.get(methodDescriptor));
+	}
+
+	@Override
+	public void run(String... args) throws Exception {
+		log.info("consumers topic keys {}", consumers.keySet());
 	}
 }

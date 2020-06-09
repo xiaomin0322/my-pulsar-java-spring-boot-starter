@@ -93,7 +93,7 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		log.info("producers {} ",producers.keySet());
+		log.info("producers topic keys {} ",producers.keySet());
 		
 	}
 }
