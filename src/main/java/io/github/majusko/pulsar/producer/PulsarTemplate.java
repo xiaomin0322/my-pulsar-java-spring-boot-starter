@@ -34,7 +34,7 @@ public class PulsarTemplate {
 	}
 
 	private <T> SendResult check(Producer<T> producer, SendMessage<T> msg) throws PulsarClientException {
-		if (producer == null || msg == null) {
+		if (producer == null || msg == null || msg.getValue() == null) {
 			return SendResult.FAILURE_NULL;
 		}
 		return SendResult.SUCCESS;
