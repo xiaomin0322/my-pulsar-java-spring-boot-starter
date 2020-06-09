@@ -25,9 +25,10 @@ public class TestConsumerConfiguration {
 		Assertions.assertNotNull(myMsg);
 	}
 
-	@PulsarConsumer(topic = "topic-zzm2", clazz = MyMsg.class)
+	// @PulsarConsumer(topic = "topic-zzm2", clazz = MyMsg.class)
+	@PulsarConsumer(topic = "topic-zzm2", clazz = MyMsg.class, configuration = { ConsumerConfig.class })
 	public void topicOneTheListener2(ConsumeMessage<MyMsg> myMsg) {
-		System.out.println("=============================" + myMsg.getValue().getData());
+		System.out.println("===============1111111111111111==============" + myMsg.getValue().getData());
 		Assertions.assertNotNull(myMsg);
 	}
 }

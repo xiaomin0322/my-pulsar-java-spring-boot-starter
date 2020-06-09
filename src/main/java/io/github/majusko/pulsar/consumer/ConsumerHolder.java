@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 import com.google.common.collect.Sets;
 
@@ -34,6 +36,7 @@ public class ConsumerHolder {
 		return configurationDataExt;
 	}
 
+	@SuppressWarnings("unchecked")
 	public ConsumerConfigurationDataExt getConfig() {
 		ConsumerConfigurationDataExt def = getDef();
 		if (annotation == null || ArrayUtils.isEmpty(annotation.configuration())) {
@@ -49,6 +52,18 @@ public class ConsumerHolder {
 			Object newInstance = clazz.newInstance();
 			ConsumerConfigurationDataExt configurationDataExt = (ConsumerConfigurationDataExt) findFirst.get()
 					.invoke(newInstance);
+			if(CollectionUtils.isEmpty(configurationDataExt.getTopicNames())) {
+				configurationDataExt.setTopicNames(def.getTopicNames());
+			}
+			if(StringUtils.isBlank(configurationDataExt.getConsumerName())) {
+				configurationDataExt.setConsumerName(def.getConsumerName());
+			}
+			if(StringUtils.isBlank(configurationDataExt.getSubscriptionName())) {
+				configurationDataExt.setSubscriptionName(def.getSubscriptionName());
+			}
+			if(configurationDataExt.getSubscriptionType() == null) {
+				configurationDataExt.setSubscriptionType(def.getSubscriptionType());
+			}
 			return configurationDataExt;
 		} catch (Exception e) {
 			e.printStackTrace();

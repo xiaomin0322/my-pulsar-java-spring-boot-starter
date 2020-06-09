@@ -15,6 +15,6 @@ public @interface PulsarConsumer {
     String topic() default "";
     Class<?> clazz() ;
     Serialization serialization() default Serialization.JSON;
-    SubscriptionType subscriptionType() default SubscriptionType.Failover;
+    SubscriptionType subscriptionType() default SubscriptionType.Shared;
     Class<?>[] configuration() default {}; 
 }
