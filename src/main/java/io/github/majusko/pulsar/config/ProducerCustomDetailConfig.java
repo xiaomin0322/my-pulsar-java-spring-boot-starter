@@ -12,7 +12,7 @@ import lombok.Data;
  *
  */
 @Data
-public class ProducerCustomDetailConfig {
+public class ProducerCustomDetailConfig extends BaseCustomDetailConfig {
 
 	private String topic;
 	private Class<?> clazz;

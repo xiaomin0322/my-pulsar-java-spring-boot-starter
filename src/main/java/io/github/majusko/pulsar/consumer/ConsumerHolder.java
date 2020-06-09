@@ -12,10 +12,11 @@ import com.google.common.collect.Sets;
 
 import io.github.majusko.pulsar.annotation.PulsarConsumer;
 import io.github.majusko.pulsar.config.ConsumerConfigurationDataExt;
+import io.github.majusko.pulsar.config.ConsumerCustomDetailConfig;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ConsumerHolder {
+public class ConsumerHolder extends ConsumerCustomDetailConfig {
 
 	private final PulsarConsumer annotation;
 	private final Method handler;
@@ -25,6 +26,12 @@ public class ConsumerHolder {
 		this.annotation = annotation;
 		this.handler = handler;
 		this.bean = bean;
+		if (annotation != null) {
+			super.setTopic(annotation.topic());
+			super.setSerialization(annotation.serialization());
+			super.setClazz(annotation.clazz());
+		}
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -40,11 +47,13 @@ public class ConsumerHolder {
 
 	@SuppressWarnings("unchecked")
 	public ConsumerConfigurationDataExt getConfig() {
+		//默认配置
 		ConsumerConfigurationDataExt def = getDef();
 		if (annotation == null || ArrayUtils.isEmpty(annotation.configuration())) {
 			return def;
 		}
 		try {
+			//注解配置
 			Class<?> clazz = annotation.configuration()[0];
 			Optional<Method> findFirst = Arrays.stream(clazz.getDeclaredMethods())
 					.filter($ -> $.getReturnType().equals(ConsumerConfigurationDataExt.class)).findFirst();
