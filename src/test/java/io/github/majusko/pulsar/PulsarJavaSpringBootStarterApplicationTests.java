@@ -62,7 +62,7 @@ class PulsarJavaSpringBootStarterApplicationTests {
 	void testProducerSendMethod22() throws PulsarClientException {
 		SendMessage<MyMsg> message = new SendMessage<>(new MyMsg("asdasd"));
 		SendResult send = producer.send("topic-zzm2", message);
-		System.out.println("=========" + send.getMsgId());
+		System.out.println("=========" + send.isSucceed());
 	}
 
 	@Test

@@ -11,8 +11,10 @@ import org.springframework.context.annotation.Configuration;
 
 import io.github.majusko.pulsar.annotation.PulsarConsumer;
 import io.github.majusko.pulsar.consumer.ConsumerHolder;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
+@Slf4j
 public class ConsumerCollector implements BeanPostProcessor {
 
 	private Map<String, ConsumerHolder> consumers = new ConcurrentHashMap<>();
@@ -25,6 +27,8 @@ public class ConsumerCollector implements BeanPostProcessor {
 				.filter($ -> $.isAnnotationPresent(PulsarConsumer.class))
 				.collect(Collectors.toMap(method -> beanClass.getName() + "#" + method.getName(),
 						method -> new ConsumerHolder(method.getAnnotation(PulsarConsumer.class), method, bean))));
+
+		log.info("consumers keys {}", consumers.keySet());
 
 		return bean;
 	}

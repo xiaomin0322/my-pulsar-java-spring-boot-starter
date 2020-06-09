@@ -15,13 +15,14 @@ import org.apache.pulsar.client.api.Schema;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
-import io.github.majusko.pulsar.annotation.PulsarConsumer;
 import io.github.majusko.pulsar.collector.ConsumerCollector;
 import io.github.majusko.pulsar.config.ConsumerConfigurationDataExt;
 import io.github.majusko.pulsar.util.ConfigurationDataUtils;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @DependsOn({ "pulsarClient", "consumerCollector" })
+@Slf4j
 public class ConsumerBuilder {
 
 	private final ConsumerCollector consumerCollector;
@@ -52,6 +53,7 @@ public class ConsumerBuilder {
 						.loadConf(ConfigurationDataUtils.toMap(config, ConsumerConfigurationDataExt.class));
 			}
 			consumerBuilder.messageListener(new ConsumerMessageListener(holder));
+			log.info("consumer : {} subscribed ",name);
 			return consumerBuilder.subscribe();
 		} catch (PulsarClientException e) {
 			throw new RuntimeException("TODO Custom Exception!", e);

@@ -14,7 +14,7 @@ public class ProducerHolder {
 	private Class<?> clazz;
 
 	private Serialization serialization = Serialization.JSON;
-	
+
 	private ProducerConfigurationDataExt config;
 
 	public Serialization getSerialization() {
@@ -29,11 +29,11 @@ public class ProducerHolder {
 	}
 
 	public ProducerConfigurationDataExt getDef() {
-	    config = new ProducerConfigurationDataExt();
+		config = new ProducerConfigurationDataExt();
 		config.setTopicName(topic);
 		return config;
 	}
-	
+
 	public ProducerConfigurationDataExt getConfig() {
 		return getDef();
 	}

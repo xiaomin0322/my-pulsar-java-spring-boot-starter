@@ -12,7 +12,9 @@ import com.google.common.collect.Sets;
 
 import io.github.majusko.pulsar.annotation.PulsarConsumer;
 import io.github.majusko.pulsar.config.ConsumerConfigurationDataExt;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ConsumerHolder {
 
 	private final PulsarConsumer annotation;
@@ -52,21 +54,21 @@ public class ConsumerHolder {
 			Object newInstance = clazz.newInstance();
 			ConsumerConfigurationDataExt configurationDataExt = (ConsumerConfigurationDataExt) findFirst.get()
 					.invoke(newInstance);
-			if(CollectionUtils.isEmpty(configurationDataExt.getTopicNames())) {
+			if (CollectionUtils.isEmpty(configurationDataExt.getTopicNames())) {
 				configurationDataExt.setTopicNames(def.getTopicNames());
 			}
-			if(StringUtils.isBlank(configurationDataExt.getConsumerName())) {
+			if (StringUtils.isBlank(configurationDataExt.getConsumerName())) {
 				configurationDataExt.setConsumerName(def.getConsumerName());
 			}
-			if(StringUtils.isBlank(configurationDataExt.getSubscriptionName())) {
+			if (StringUtils.isBlank(configurationDataExt.getSubscriptionName())) {
 				configurationDataExt.setSubscriptionName(def.getSubscriptionName());
 			}
-			if(configurationDataExt.getSubscriptionType() == null) {
+			if (configurationDataExt.getSubscriptionType() == null) {
 				configurationDataExt.setSubscriptionType(def.getSubscriptionType());
 			}
 			return configurationDataExt;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("getConfigException", e);
 		}
 
 		return def;
