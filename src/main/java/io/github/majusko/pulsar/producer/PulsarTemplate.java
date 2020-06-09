@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import io.github.majusko.pulsar.collector.ProducerCollector;
-import io.github.majusko.pulsar.config.ProducerConfigurationDataExt;
+import io.github.majusko.pulsar.config.ProducerCustomDetailConfig;
 
 @Component
 public class PulsarTemplate {
@@ -28,7 +28,7 @@ public class PulsarTemplate {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> SendResult send(String topic, SendMessage<T> msg, ProducerConfigurationDataExt config)
+	public <T> SendResult send(String topic, SendMessage<T> msg, ProducerCustomDetailConfig config)
 			throws PulsarClientException {
 		return send(producerCollector.getProducer(topic, msg, config), msg);
 	}

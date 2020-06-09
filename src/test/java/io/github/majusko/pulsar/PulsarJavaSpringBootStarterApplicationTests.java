@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import io.github.majusko.pulsar.collector.ConsumerCollector;
+import io.github.majusko.pulsar.config.ConsumerCustomConfig;
 import io.github.majusko.pulsar.consumer.ConsumerBuilder;
 import io.github.majusko.pulsar.consumer.ConsumerHolder;
 import io.github.majusko.pulsar.producer.ProducerFactory;
@@ -105,4 +106,12 @@ class PulsarJavaSpringBootStarterApplicationTests {
 		Assertions.assertTrue(topicNames.contains("topic-one"));
 		Assertions.assertTrue(topicNames.contains("topic-two"));
 	}*/
+	
+	@Autowired
+	ConsumerCustomConfig consumerCustomConfig;
+	
+	@Test
+	void testConfig() {
+		System.out.println(consumerCustomConfig.getConsumer());
+	}
 }
