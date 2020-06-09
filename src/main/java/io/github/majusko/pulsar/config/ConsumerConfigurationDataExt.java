@@ -11,7 +11,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.majusko.pulsar.constant.Serialization;
 
-public class ConsumerConfigurationDataExt<T> extends ConsumerConfigurationData<T> {
+@SuppressWarnings("rawtypes")
+public class ConsumerConfigurationDataExt extends ConsumerConfigurationData {
 	/**
 	 * 
 	 */

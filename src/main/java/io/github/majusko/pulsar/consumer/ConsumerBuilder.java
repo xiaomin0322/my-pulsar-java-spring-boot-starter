@@ -2,7 +2,6 @@ package io.github.majusko.pulsar.consumer;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -13,11 +12,11 @@ import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.Schema;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import io.github.majusko.pulsar.annotation.PulsarConsumer;
 import io.github.majusko.pulsar.collector.ConsumerCollector;
-import io.github.majusko.pulsar.config.ConsumerConfigManage;
+import io.github.majusko.pulsar.config.ConsumerConfigurationDataExt;
+import io.github.majusko.pulsar.util.ConfigurationDataUtils;
 
 @Component
 @DependsOn({ "pulsarClient", "consumerCollector" })
@@ -25,16 +24,13 @@ public class ConsumerBuilder {
 
 	private final ConsumerCollector consumerCollector;
 	private final PulsarClient pulsarClient;
-	private final ConsumerConfigManage consumerConfigManage;
 
 	@SuppressWarnings("rawtypes")
 	private List<Consumer> consumers;
 
-	public ConsumerBuilder(ConsumerCollector consumerCollector, PulsarClient pulsarClient,
-			ConsumerConfigManage consumerConfigManage) {
+	public ConsumerBuilder(ConsumerCollector consumerCollector, PulsarClient pulsarClient) {
 		this.consumerCollector = consumerCollector;
 		this.pulsarClient = pulsarClient;
-		this.consumerConfigManage = consumerConfigManage;
 	}
 
 	@PostConstruct
@@ -47,15 +43,18 @@ public class ConsumerBuilder {
 		try {
 			PulsarConsumer annotation = holder.getAnnotation();
 			Schema<?> schema = Schema.JSON(holder.getAnnotation().clazz());
-			
-			org.apache.pulsar.client.api.ConsumerBuilder<?> consumerBuilder = pulsarClient
-					.newConsumer(schema)
+			org.apache.pulsar.client.api.ConsumerBuilder<?> consumerBuilder = pulsarClient.newConsumer(schema)
 					.subscriptionType(annotation.subscriptionType()).consumerName("consumer-" + name)
 					.subscriptionName("subscription-" + name).topic(holder.getAnnotation().topic())
 					.messageListener((consumer, msg) -> {
 						try {
 							final Method method = holder.getHandler();
 
+							Class<?> returnType = method.getReturnType();
+							Object value = msg.getValue();
+							if (!returnType.equals(value.getClass())) {
+								value = msg;
+							}
 							method.setAccessible(true);
 							method.invoke(holder.getBean(), msg.getValue());
 
@@ -65,9 +64,10 @@ public class ConsumerBuilder {
 							throw new RuntimeException("TODO Custom Exception!", e);
 						}
 					});
-			Map<String, Object> config = consumerConfigManage.getConfig(annotation.topic());
-			if (!CollectionUtils.isEmpty(config)) {
-				consumerBuilder.loadConf(config);
+
+			ConsumerConfigurationDataExt config = holder.getConsumerConfigurationDataExt();
+			if (config != null) {
+				consumerBuilder.loadConf(ConfigurationDataUtils.toMap(config, ConsumerConfigurationDataExt.class));
 			}
 			return consumerBuilder.subscribe();
 		} catch (PulsarClientException e) {
