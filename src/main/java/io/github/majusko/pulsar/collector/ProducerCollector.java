@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.client.api.Producer;
 import org.apache.pulsar.client.api.ProducerBuilder;
 import org.apache.pulsar.client.api.PulsarClient;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import io.github.majusko.pulsar.annotation.PulsarProducer;
-import io.github.majusko.pulsar.config.ConsumerConfigurationDataExt;
 import io.github.majusko.pulsar.config.ProducerConfigurationDataExt;
 import io.github.majusko.pulsar.config.ProducerCustomConfig;
 import io.github.majusko.pulsar.config.ProducerCustomDetailConfig;
@@ -56,8 +56,16 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 		return getProducerMap().get(topic);
 	}
 
+	@SuppressWarnings("rawtypes")
+	public void addProducer(String topic, Producer producer) {
+		if (StringUtils.isBlank(topic) || producer == null) {
+			return;
+		}
+		getProducerMap().put(topic, producer);
+	}
+
 	public void init() {
-		//覆盖 spring bean 配置得对象
+		// 覆盖 spring bean 配置得对象
 		Map<String, ProducerCustomDetailConfig> producersMap = producerCustomConfig.getProducer();
 		if (!CollectionUtils.isEmpty(producersMap)) {
 			producers.putAll(producersMap.values().stream()
@@ -95,11 +103,11 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 		if (producer != null) {
 			return producer;
 		}
-		if(config == null) {
-			//config = ProducerHolder.getDef();
+		if (config == null) {
+			config = ProducerHolder.getDef(topic);
 		}
 		producer = buildProducer(config);
-		producers.put(topic, producer);
+		addProducer(topic, producer);
 		return producer;
 	}
 

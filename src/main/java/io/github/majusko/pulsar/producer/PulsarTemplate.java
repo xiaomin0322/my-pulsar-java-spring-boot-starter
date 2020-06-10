@@ -14,6 +14,7 @@ import io.github.majusko.pulsar.collector.ProducerCollector;
 import io.github.majusko.pulsar.config.ProducerCustomDetailConfig;
 
 @Component
+@SuppressWarnings("unchecked")
 public class PulsarTemplate {
 
 	private final ProducerCollector producerCollector;
@@ -22,12 +23,18 @@ public class PulsarTemplate {
 		this.producerCollector = producerCollector;
 	}
 
-	@SuppressWarnings("unchecked")
+	public <T> SendResult send(String topic, T msg) throws PulsarClientException {
+		return send(topic, new SendMessage<T>(msg));
+	}
+
+	public <T> SendResult send(String topic, T msg, ProducerCustomDetailConfig config) throws PulsarClientException {
+		return send(topic, new SendMessage<T>(msg), config);
+	}
+
 	public <T> SendResult send(String topic, SendMessage<T> msg) throws PulsarClientException {
 		return send(producerCollector.getProducer(topic, msg), msg);
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T> SendResult send(String topic, SendMessage<T> msg, ProducerCustomDetailConfig config)
 			throws PulsarClientException {
 		return send(producerCollector.getProducer(topic, msg, config), msg);
@@ -40,13 +47,24 @@ public class PulsarTemplate {
 		return SendResult.SUCCESS;
 	}
 
-	@SuppressWarnings("unused")
 	private <T> SendResult send(Producer<T> producer, SendMessage<T> msg) throws PulsarClientException {
 		SendResult checkSendResult = check(producer, msg);
 		if (!checkSendResult.isSucceed()) {
 			return checkSendResult;
 		}
+		TypedMessageBuilder<T> messageBuilder = messageBuilder(producer, msg);
+		if (SendType.SYNC == msg.getSendType()) {
+			MessageId msgID = messageBuilder.send();
+			return SendResult.getSendResult(msgID);
+		} else {
+			CompletableFuture<MessageId> sendAsync = messageBuilder.sendAsync();
+			SendResult sendResult = new SendResult(sendAsync);
+			return sendResult;
+		}
 
+	}
+
+	private <T> TypedMessageBuilder<T> messageBuilder(Producer<T> producer, SendMessage<T> msg) {
 		TypedMessageBuilder<T> messageBuilder = producer.newMessage();
 		if (StringUtils.isNotBlank(msg.getKey())) {
 			messageBuilder.key(msg.getKey());
@@ -64,16 +82,7 @@ public class PulsarTemplate {
 		}
 
 		messageBuilder.value(msg.getValue());
-
-		if (SendType.SYNC == msg.getSendType()) {
-			MessageId msgID = messageBuilder.send();
-			return SendResult.getSendResult(msgID);
-		} else {
-			CompletableFuture<MessageId> sendAsync = messageBuilder.sendAsync();
-			SendResult sendResult = new SendResult(sendAsync);
-			return sendResult;
-		}
-
+		return messageBuilder;
 	}
 
 }
