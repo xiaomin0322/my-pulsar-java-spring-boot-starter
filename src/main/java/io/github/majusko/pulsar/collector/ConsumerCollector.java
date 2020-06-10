@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.CommandLineRunner;
@@ -44,11 +45,22 @@ public class ConsumerCollector implements BeanPostProcessor, CommandLineRunner {
 	}
 
 	public static String methodSign(String className, Method method) {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		if (method == null) {
 			return builder.toString();
 		}
 		builder.append(className).append("#").append(method.getName());
+		Class<?>[] typeParameters = method.getParameterTypes();
+		if (ArrayUtils.isEmpty(typeParameters)) {
+			return builder.toString();
+		}
+		builder.append("(");
+
+		Arrays.stream(typeParameters).forEach($ -> builder.append($.getName()).append(","));
+
+		builder.replace(builder.length() - 1, builder.length(), ")");
+		System.out.println(className + " name :" + builder.toString());
+
 		return builder.toString();
 	}
 
