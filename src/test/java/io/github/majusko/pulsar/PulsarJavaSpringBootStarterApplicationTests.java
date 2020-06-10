@@ -59,6 +59,15 @@ class PulsarJavaSpringBootStarterApplicationTests {
 		System.out.println("=========" + send.isSucceed());
 		Thread.sleep(10000);
 	}
+	
+	
+	@Test
+	void testProducerSendMethod33() throws Exception {
+		SendMessage<MyMsg> message = new SendMessage<>(new MyMsg("asdasd"));
+		SendResult send = producer.send("topic-zzm3", message);
+		System.out.println("=========" + send.isSucceed());
+		Thread.sleep(10000);
+	}
 
 	@Test
 	void testProducerSendMethod() throws PulsarClientException {

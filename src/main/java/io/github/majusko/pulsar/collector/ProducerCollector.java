@@ -109,7 +109,7 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 		}
 		// 获取默认配置
 		if (config == null) {
-			config = ProducerHolder.getDefConfig(topic);
+			config = ProducerHolder.getDefConfig(topic,msg.getValue());
 		}
 		producer = buildProducer(config);
 		addProducer(topic, producer);
