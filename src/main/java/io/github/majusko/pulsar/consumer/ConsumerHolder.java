@@ -20,6 +20,13 @@ public class ConsumerHolder extends ConsumerCustomDetailConfig {
 	private Method handler;
 	private Object bean;
 
+	/**
+	 * java 注解配置叫用该方法
+	 * 
+	 * @param annotation
+	 * @param handler
+	 * @param bean
+	 */
 	public ConsumerHolder(PulsarConsumer annotation, Method handler, Object bean) {
 		this.annotation = annotation;
 		this.handler = handler;
@@ -32,6 +39,13 @@ public class ConsumerHolder extends ConsumerCustomDetailConfig {
 
 	}
 
+	/**
+	 * 配置yml调用该方法
+	 * 
+	 * @param config
+	 * @param handler
+	 * @param bean
+	 */
 	public ConsumerHolder(ConsumerCustomDetailConfig config, Method handler, Object bean) {
 		this.handler = handler;
 		this.bean = bean;
