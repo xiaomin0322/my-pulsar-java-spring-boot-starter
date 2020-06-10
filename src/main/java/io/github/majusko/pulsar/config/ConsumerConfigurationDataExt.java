@@ -11,8 +11,6 @@ public class ConsumerConfigurationDataExt extends ConsumerConfigurationData {
 	@JsonIgnore
 	private String topic;
 
-
-	
 	public String getTopic() {
 		return topic;
 	}
@@ -22,6 +20,7 @@ public class ConsumerConfigurationDataExt extends ConsumerConfigurationData {
 		this.topic = topic;
 		super.setTopicNames(Sets.newHashSet(topic));
 	}
+
 	/**
 	 * 
 	 */

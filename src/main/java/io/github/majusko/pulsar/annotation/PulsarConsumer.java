@@ -12,9 +12,13 @@ import org.apache.pulsar.client.api.SubscriptionType;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface PulsarConsumer {
-    String topic() ;
-    Class<?> clazz() ;
-    Serialization serialization() default Serialization.JSON;
-    SubscriptionType subscriptionType() default SubscriptionType.Shared;
-    Class<?>[] configuration() default {}; 
+	String topic();
+
+	Class<?> clazz();
+
+	Serialization serialization() default Serialization.JSON;
+
+	SubscriptionType subscriptionType() default SubscriptionType.Shared;
+
+	Class<?>[] configuration() default {};
 }

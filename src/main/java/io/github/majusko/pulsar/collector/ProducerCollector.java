@@ -19,6 +19,7 @@ import io.github.majusko.pulsar.annotation.PulsarProducer;
 import io.github.majusko.pulsar.config.ProducerConfigurationDataExt;
 import io.github.majusko.pulsar.config.ProducerCustomConfig;
 import io.github.majusko.pulsar.config.ProducerCustomDetailConfig;
+import io.github.majusko.pulsar.exception.PulsarRuntimeException;
 import io.github.majusko.pulsar.producer.ProducerHolder;
 import io.github.majusko.pulsar.producer.PulsarProducerFactory;
 import io.github.majusko.pulsar.producer.SendMessage;
@@ -92,7 +93,7 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 			}
 			return newProducer.topic(holder.getTopic()).create();
 		} catch (PulsarClientException e) {
-			throw new RuntimeException("TODO Custom Exception!", e);
+			throw new PulsarRuntimeException("TODO Custom Exception!", e);
 		}
 	}
 

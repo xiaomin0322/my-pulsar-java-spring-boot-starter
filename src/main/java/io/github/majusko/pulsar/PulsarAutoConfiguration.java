@@ -16,25 +16,22 @@ import java.util.concurrent.TimeUnit;
 @EnableConfigurationProperties(PulsarProperties.class)
 public class PulsarAutoConfiguration {
 
-    private final PulsarProperties pulsarProperties;
+	private final PulsarProperties pulsarProperties;
 
-    public PulsarAutoConfiguration(PulsarProperties pulsarProperties) {
-        this.pulsarProperties = pulsarProperties;
-    }
+	public PulsarAutoConfiguration(PulsarProperties pulsarProperties) {
+		this.pulsarProperties = pulsarProperties;
+	}
 
-    @Bean
-    @ConditionalOnMissingBean
-    public PulsarClient pulsarClient() throws PulsarClientException {
-        return PulsarClient.builder()
-            .serviceUrl(pulsarProperties.getServiceUrl())
-            .ioThreads(pulsarProperties.getIoThreads())
-            .listenerThreads(pulsarProperties.getListenerThreads())
-            .enableTcpNoDelay(pulsarProperties.isEnableTcpNoDelay())
-            .keepAliveInterval(pulsarProperties.getKeepAliveIntervalSec(), TimeUnit.SECONDS)
-            .connectionTimeout(pulsarProperties.getConnectionTimeoutSec(), TimeUnit.SECONDS)
-            .operationTimeout(pulsarProperties.getOperationTimeoutSec(), TimeUnit.SECONDS)
-            .startingBackoffInterval(pulsarProperties.getStartingBackoffIntervalMs(), TimeUnit.MILLISECONDS)
-            .maxBackoffInterval(pulsarProperties.getMaxBackoffIntervalSec(), TimeUnit.SECONDS)
-            .build();
-    }
+	@Bean
+	@ConditionalOnMissingBean
+	public PulsarClient pulsarClient() throws PulsarClientException {
+		return PulsarClient.builder().serviceUrl(pulsarProperties.getServiceUrl())
+				.ioThreads(pulsarProperties.getIoThreads()).listenerThreads(pulsarProperties.getListenerThreads())
+				.enableTcpNoDelay(pulsarProperties.isEnableTcpNoDelay())
+				.keepAliveInterval(pulsarProperties.getKeepAliveIntervalSec(), TimeUnit.SECONDS)
+				.connectionTimeout(pulsarProperties.getConnectionTimeoutSec(), TimeUnit.SECONDS)
+				.operationTimeout(pulsarProperties.getOperationTimeoutSec(), TimeUnit.SECONDS)
+				.startingBackoffInterval(pulsarProperties.getStartingBackoffIntervalMs(), TimeUnit.MILLISECONDS)
+				.maxBackoffInterval(pulsarProperties.getMaxBackoffIntervalSec(), TimeUnit.SECONDS).build();
+	}
 }

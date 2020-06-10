@@ -14,18 +14,17 @@ import lombok.Data;
 public class ConsumerCustomDetailConfig extends BaseCustomDetailConfig {
 
 	private ConsumerConfigurationDataExt config;
-	
+
 	/**
-	 *  消费者执行得method
+	 * 消费者执行得method
 	 */
 	@JsonIgnore
 	private String methodSign;
-	
-	
+
 	@Override
 	public void setTopic(String topic) {
 		super.setTopic(topic);
-		if(getConfig()!=null) {
+		if (getConfig() != null) {
 			getConfig().setTopic(topic);
 		}
 	}

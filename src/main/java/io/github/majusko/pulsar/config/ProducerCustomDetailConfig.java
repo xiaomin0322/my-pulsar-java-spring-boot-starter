@@ -19,7 +19,7 @@ public class ProducerCustomDetailConfig extends BaseCustomDetailConfig {
 	@Override
 	public void setTopic(String topic) {
 		super.setTopic(topic);
-		if(getConfig()!=null) {
+		if (getConfig() != null) {
 			getConfig().setTopic(topic);
 		}
 	}

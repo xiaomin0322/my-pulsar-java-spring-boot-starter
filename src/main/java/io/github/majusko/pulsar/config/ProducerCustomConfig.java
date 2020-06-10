@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 import lombok.Data;
 
 @Component
-@ConfigurationProperties(prefix="pulsar")
+@ConfigurationProperties(prefix = "pulsar")
 @Data
 public class ProducerCustomConfig {
-	
-	private Map<String,ProducerCustomDetailConfig> producer;
-	
+
+	private Map<String, ProducerCustomDetailConfig> producer;
+
 }

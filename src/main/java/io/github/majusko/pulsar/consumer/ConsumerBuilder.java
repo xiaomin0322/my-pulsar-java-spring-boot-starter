@@ -17,18 +17,19 @@ import org.springframework.stereotype.Component;
 
 import io.github.majusko.pulsar.collector.ConsumerCollector;
 import io.github.majusko.pulsar.config.ConsumerConfigurationDataExt;
+import io.github.majusko.pulsar.exception.PulsarRuntimeException;
 import io.github.majusko.pulsar.util.ConfigurationDataUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @DependsOn({ "pulsarClient", "consumerCollector" })
 @Slf4j
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class ConsumerBuilder {
 
 	private final ConsumerCollector consumerCollector;
 	private final PulsarClient pulsarClient;
 
-	@SuppressWarnings("rawtypes")
 	private List<Consumer> consumers;
 
 	public ConsumerBuilder(ConsumerCollector consumerCollector, PulsarClient pulsarClient) {
@@ -42,7 +43,6 @@ public class ConsumerBuilder {
 				.map(holder -> subscribe(holder.getKey(), holder.getValue())).collect(Collectors.toList());
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Consumer<?> subscribe(String name, ConsumerHolder holder) {
 		try {
 			Schema<?> schema = holder.schema();
@@ -53,17 +53,17 @@ public class ConsumerBuilder {
 						.loadConf(ConfigurationDataUtils.toMap(config, ConsumerConfigurationDataExt.class));
 			} else {
 				log.error("Consumer  topic : {} not fount ConsumerConfigurationDataExt ", name);
-				throw new RuntimeException("Consumer  topic :" + name + " not fount ConsumerConfigurationDataExt");
+				throw new PulsarRuntimeException(
+						"Consumer  topic :" + name + " not fount ConsumerConfigurationDataExt");
 			}
 			consumerBuilder = consumerBuilder.messageListener(new ConsumerMessageListener(holder));
 			log.info("consumer : {} subscribed ", name);
 			return consumerBuilder.subscribe();
 		} catch (PulsarClientException e) {
-			throw new RuntimeException("TODO Custom Exception!", e);
+			throw new PulsarRuntimeException("TODO Custom Exception!", e);
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	public List<Consumer> getConsumers() {
 		return consumers;
 	}
@@ -94,7 +94,7 @@ class ConsumerMessageListener<T> implements MessageListener<T> {
 			consumer.acknowledge(msg);
 		} catch (Exception e) {
 			consumer.negativeAcknowledge(msg);
-			throw new RuntimeException("TODO Custom Exception!", e);
+			throw new PulsarRuntimeException("TODO Custom Exception!", e);
 		}
 
 	}

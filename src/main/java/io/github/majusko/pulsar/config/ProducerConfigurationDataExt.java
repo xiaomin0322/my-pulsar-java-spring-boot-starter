@@ -9,7 +9,7 @@ public class ProducerConfigurationDataExt extends ProducerConfigurationData {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	@JsonIgnore
 	private String topic;
 
@@ -20,7 +20,5 @@ public class ProducerConfigurationDataExt extends ProducerConfigurationData {
 	public void setTopic(String topic) {
 		this.topic = topic;
 	}
-	
-	
 
 }

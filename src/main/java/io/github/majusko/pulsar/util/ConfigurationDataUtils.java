@@ -1,12 +1,15 @@
 package io.github.majusko.pulsar.util;
 
+import java.io.IOException;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+
+import io.github.majusko.pulsar.exception.PulsarRuntimeException;
 import io.netty.util.concurrent.FastThreadLocal;
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * Utils for loading configuration data.
@@ -44,7 +47,7 @@ public final class ConfigurationDataUtils {
 			String configJson = mapper.writeValueAsString(newConfig);
 			return mapper.readValue(configJson, dataCls);
 		} catch (IOException e) {
-			throw new RuntimeException("Failed to load config into existing configuration data", e);
+			throw new PulsarRuntimeException("Failed to load config into existing configuration data", e);
 		}
 
 	}
@@ -57,7 +60,7 @@ public final class ConfigurationDataUtils {
 			Map<String, Object> existingConfig = mapper.readValue(existingConfigJson, Map.class);
 			return existingConfig;
 		} catch (IOException e) {
-			throw new RuntimeException("Failed to load config into existing configuration data", e);
+			throw new PulsarRuntimeException("Failed to load config into existing configuration data", e);
 		}
 
 	}

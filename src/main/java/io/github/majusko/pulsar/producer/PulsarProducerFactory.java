@@ -3,5 +3,5 @@ package io.github.majusko.pulsar.producer;
 import java.util.Map;
 
 public interface PulsarProducerFactory {
-    Map<String, ProducerHolder> getTopics();
+	Map<String, ProducerHolder> getTopics();
 }

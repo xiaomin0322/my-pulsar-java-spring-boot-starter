@@ -15,21 +15,19 @@
 package io.github.majusko.pulsar.producer;
 
 /**
- * 消息发送方式
- * Created by zzm
+ * 消息发送方式 Created by zzm
  */
 public enum SendType {
 
-    SYNC("sync"), ASYNC("async");
+	SYNC("sync"), ASYNC("async");
 
-    private String sendType;
+	private String sendType;
 
-    SendType(String sendType) {
-        this.sendType = sendType;
-    }
+	SendType(String sendType) {
+		this.sendType = sendType;
+	}
 
-    public String getSendType() {
-        return sendType;
-    }
+	public String getSendType() {
+		return sendType;
+	}
 }
-
