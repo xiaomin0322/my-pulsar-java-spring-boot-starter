@@ -59,7 +59,7 @@ public class ConsumerCollector implements BeanPostProcessor, CommandLineRunner {
 		Arrays.stream(typeParameters).forEach($ -> builder.append($.getName()).append(","));
 
 		builder.replace(builder.length() - 1, builder.length(), ")");
-		System.out.println(className + " name :" + builder.toString());
+		//System.out.println(className + " name :" + builder.toString());
 
 		return builder.toString();
 	}
