@@ -16,11 +16,12 @@ public class ProducerCustomDetailConfig extends BaseCustomDetailConfig {
 	public ProducerCustomDetailConfig() {
 	}
 
-	public ProducerConfigurationDataExt getConfig() {
-	    if(config!=null) {
-	    	config.setTopicName(getTopic());
-	    }	
-		return config;
+	@Override
+	public void setTopic(String topic) {
+		super.setTopic(topic);
+		if(getConfig()!=null) {
+			getConfig().setTopic(topic);
+		}
 	}
 
 }

@@ -47,10 +47,13 @@ public class ConsumerBuilder {
 		try {
 			Schema<?> schema = holder.schema();
 			org.apache.pulsar.client.api.ConsumerBuilder<?> consumerBuilder = pulsarClient.newConsumer(schema);
-			ConsumerConfigurationDataExt config = consumerCollector.getConsumerConfigurationDataExt(holder.getTopic());
+			ConsumerConfigurationDataExt config = holder.getConfig();
 			if (config != null) {
 				consumerBuilder = consumerBuilder
 						.loadConf(ConfigurationDataUtils.toMap(config, ConsumerConfigurationDataExt.class));
+			} else {
+				log.error("Consumer  topic : {} not fount ConsumerConfigurationDataExt ", name);
+				throw new RuntimeException("Consumer  topic :" + name + " not fount ConsumerConfigurationDataExt");
 			}
 			consumerBuilder = consumerBuilder.messageListener(new ConsumerMessageListener(holder));
 			log.info("consumer : {} subscribed ", name);

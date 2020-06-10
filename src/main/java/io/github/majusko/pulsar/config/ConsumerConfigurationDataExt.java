@@ -8,19 +8,20 @@ import com.google.common.collect.Sets;
 @SuppressWarnings("rawtypes")
 public class ConsumerConfigurationDataExt extends ConsumerConfigurationData {
 
+	@JsonIgnore
 	private String topic;
 
-	@SuppressWarnings("unchecked")
-	@JsonIgnore
-	public void setTopic(String topic) {
-		this.topic = topic;
-		setTopicNames(Sets.newHashSet(topic));
-	}
 
+	
 	public String getTopic() {
 		return topic;
 	}
 
+	@SuppressWarnings("unchecked")
+	public void setTopic(String topic) {
+		this.topic = topic;
+		super.setTopicNames(Sets.newHashSet(topic));
+	}
 	/**
 	 * 
 	 */

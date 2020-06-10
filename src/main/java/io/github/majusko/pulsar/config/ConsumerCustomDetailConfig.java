@@ -1,5 +1,7 @@
 package io.github.majusko.pulsar.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 
 /**
@@ -12,4 +14,19 @@ import lombok.Data;
 public class ConsumerCustomDetailConfig extends BaseCustomDetailConfig {
 
 	private ConsumerConfigurationDataExt config;
+	
+	/**
+	 *  消费者执行得method
+	 */
+	@JsonIgnore
+	private String methodSign;
+	
+	
+	@Override
+	public void setTopic(String topic) {
+		super.setTopic(topic);
+		if(getConfig()!=null) {
+			getConfig().setTopic(topic);
+		}
+	}
 }

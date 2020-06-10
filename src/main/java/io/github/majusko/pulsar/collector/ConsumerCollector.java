@@ -1,10 +1,12 @@
 package io.github.majusko.pulsar.collector;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -25,8 +27,6 @@ public class ConsumerCollector implements BeanPostProcessor, CommandLineRunner {
 
 	private Map<String, ConsumerHolder> consumers = new ConcurrentHashMap<>();
 
-	private Map<String, ConsumerConfigurationDataExt> consumerCustomDetailConfigMap = new ConcurrentHashMap<>();
-
 	@Autowired
 	private ConsumerCustomConfig consumerCustomConfig;
 
@@ -43,6 +43,26 @@ public class ConsumerCollector implements BeanPostProcessor, CommandLineRunner {
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
+		if (CollectionUtils.isEmpty(consumerCustomConfig.getConsumer())) {
+			return bean;
+		}
+		Collection<ConsumerCustomDetailConfig> consumerCustomDetailConfigs = consumerCustomConfig.getConsumer()
+				.values();
+		if (CollectionUtils.isEmpty(consumerCustomDetailConfigs)) {
+			return bean;
+		}
+		final Class<?> beanClass = bean.getClass();
+		consumers.putAll(Arrays.stream(beanClass.getDeclaredMethods()).filter($ -> {
+			Optional<ConsumerCustomDetailConfig> optional = consumerCustomDetailConfigs.stream()
+					.filter(c -> $.getName().equals(c.getMethodSign())).findFirst();
+			return optional.isPresent();
+		}).collect(
+				Collectors
+						.toMap(method -> beanClass.getName() + "#" + method.getName(),
+								method -> new ConsumerHolder(consumerCustomDetailConfigs.stream()
+										.filter(c -> method.getName().equals(c.getMethodSign())).findFirst().get(),
+										method, bean))));
+
 		return bean;
 	}
 
@@ -50,48 +70,8 @@ public class ConsumerCollector implements BeanPostProcessor, CommandLineRunner {
 		return consumers;
 	}
 
-	public Map<String, ConsumerConfigurationDataExt> getConsumerCustomDetailConfigMap() {
-		if (!CollectionUtils.isEmpty(consumerCustomDetailConfigMap)) {
-			return consumerCustomDetailConfigMap;
-		}
-		synchronized (consumerCustomDetailConfigMap) {
-			if (!CollectionUtils.isEmpty(consumerCustomDetailConfigMap)) {
-				return consumerCustomDetailConfigMap;
-			}
-			init();
-		}
-		return consumerCustomDetailConfigMap;
-	}
-
-	public ConsumerConfigurationDataExt getConsumerConfigurationDataExt(String topic) {
-		ConsumerConfigurationDataExt configurationDataExt = getConsumerCustomDetailConfigMap().get(topic);
-		if (configurationDataExt != null) {
-			configurationDataExt.setTopic(topic);
-			return configurationDataExt;
-		}
-		return null;
-	}
-
-	public void setConsumerCustomDetailConfigMap(
-			Map<String, ConsumerConfigurationDataExt> consumerCustomDetailConfigMap) {
-		this.consumerCustomDetailConfigMap = consumerCustomDetailConfigMap;
-	}
-
 	public Optional<ConsumerHolder> getConsumer(String methodDescriptor) {
 		return Optional.ofNullable(consumers.get(methodDescriptor));
-	}
-
-	public void init() {
-		// java定义得配置
-		consumerCustomDetailConfigMap.putAll(consumers.values().stream()
-				.collect(Collectors.toMap(ConsumerHolder::getTopic, ConsumerHolder::getConfig)));
-
-		// 配置文件的配置
-		Map<String, ConsumerCustomDetailConfig> consumersMap = consumerCustomConfig.getConsumer();
-		if (!CollectionUtils.isEmpty(consumersMap)) {
-			consumerCustomDetailConfigMap.putAll(consumersMap.values().stream().collect(
-					Collectors.toMap(ConsumerCustomDetailConfig::getTopic, ConsumerCustomDetailConfig::getConfig)));
-		}
 	}
 
 	@Override

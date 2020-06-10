@@ -1,9 +1,6 @@
 package io.github.majusko.pulsar;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.PulsarClientException;
@@ -19,8 +16,6 @@ import io.github.majusko.pulsar.collector.ConsumerCollector;
 import io.github.majusko.pulsar.config.ConsumerCustomConfig;
 import io.github.majusko.pulsar.consumer.ConsumerBuilder;
 import io.github.majusko.pulsar.consumer.ConsumerHolder;
-import io.github.majusko.pulsar.producer.ProducerFactory;
-import io.github.majusko.pulsar.producer.ProducerHolder;
 import io.github.majusko.pulsar.producer.PulsarTemplate;
 import io.github.majusko.pulsar.producer.SendMessage;
 import io.github.majusko.pulsar.producer.SendResult;
@@ -112,6 +107,7 @@ class PulsarJavaSpringBootStarterApplicationTests {
 	
 	@Test
 	void testConfig() {
-		System.out.println(consumerCustomConfig.getConsumer());
+		System.out.println(consumerCustomConfig.getConsumer().get("topic-zzm2").getConfig().getTopic());
+		System.out.println(consumerCustomConfig.getConsumer().get("topic-zzm2").getMethodSign());
 	}
 }

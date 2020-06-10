@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
 import com.google.common.collect.Sets;
@@ -18,9 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ConsumerHolder extends ConsumerCustomDetailConfig {
 
-	private final PulsarConsumer annotation;
-	private final Method handler;
-	private final Object bean;
+	private PulsarConsumer annotation;
+	private Method handler;
+	private Object bean;
 
 	public ConsumerHolder(PulsarConsumer annotation, Method handler, Object bean) {
 		this.annotation = annotation;
@@ -32,6 +33,12 @@ public class ConsumerHolder extends ConsumerCustomDetailConfig {
 			super.setClazz(annotation.clazz());
 		}
 
+	}
+
+	public ConsumerHolder(ConsumerCustomDetailConfig config, Method handler, Object bean) {
+		this.handler = handler;
+		this.bean = bean;
+		BeanUtils.copyProperties(config, this);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -47,13 +54,16 @@ public class ConsumerHolder extends ConsumerCustomDetailConfig {
 
 	@SuppressWarnings("unchecked")
 	public ConsumerConfigurationDataExt getConfig() {
-		//默认配置
+		if (super.getConfig() != null) {
+			return super.getConfig();
+		}
+		// 默认配置
 		ConsumerConfigurationDataExt def = getDef();
 		if (annotation == null || ArrayUtils.isEmpty(annotation.configuration())) {
 			return def;
 		}
 		try {
-			//注解配置
+			// 注解配置
 			Class<?> clazz = annotation.configuration()[0];
 			Optional<Method> findFirst = Arrays.stream(clazz.getDeclaredMethods())
 					.filter($ -> $.getReturnType().equals(ConsumerConfigurationDataExt.class)).findFirst();
