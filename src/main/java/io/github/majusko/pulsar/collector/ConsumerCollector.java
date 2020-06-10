@@ -1,12 +1,12 @@
 package io.github.majusko.pulsar.collector;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.CollectionUtils;
 
 import io.github.majusko.pulsar.annotation.PulsarConsumer;
-import io.github.majusko.pulsar.config.ConsumerConfigurationDataExt;
 import io.github.majusko.pulsar.config.ConsumerCustomConfig;
 import io.github.majusko.pulsar.config.ConsumerCustomDetailConfig;
 import io.github.majusko.pulsar.consumer.ConsumerHolder;
@@ -41,6 +40,15 @@ public class ConsumerCollector implements BeanPostProcessor, CommandLineRunner {
 		return bean;
 	}
 
+	public static String methodSign(String className, Method method) {
+		StringBuilder builder = new StringBuilder();
+		if (method == null) {
+			return builder.toString();
+		}
+		builder.append(className).append(method.getName());
+		return builder.toString();
+	}
+
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		if (CollectionUtils.isEmpty(consumerCustomConfig.getConsumer())) {
@@ -54,14 +62,13 @@ public class ConsumerCollector implements BeanPostProcessor, CommandLineRunner {
 		final Class<?> beanClass = bean.getClass();
 		consumers.putAll(Arrays.stream(beanClass.getDeclaredMethods()).filter($ -> {
 			Optional<ConsumerCustomDetailConfig> optional = consumerCustomDetailConfigs.stream()
-					.filter(c -> $.getName().equals(c.getMethodSign())).findFirst();
+					.filter(c -> methodSign(beanName, $).equals(c.getMethodSign())).findFirst();
 			return optional.isPresent();
 		}).collect(
-				Collectors
-						.toMap(method -> beanClass.getName() + "#" + method.getName(),
-								method -> new ConsumerHolder(consumerCustomDetailConfigs.stream()
-										.filter(c -> method.getName().equals(c.getMethodSign())).findFirst().get(),
-										method, bean))));
+				Collectors.toMap(method -> beanClass.getName() + "#" + method.getName(),
+						method -> new ConsumerHolder(consumerCustomDetailConfigs.stream()
+								.filter(c -> methodSign(beanName, method).equals(c.getMethodSign())).findFirst().get(),
+								method, bean))));
 
 		return bean;
 	}

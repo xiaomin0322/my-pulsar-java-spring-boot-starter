@@ -27,36 +27,37 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
+@SuppressWarnings("rawtypes")
 public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 
 	private final PulsarClient pulsarClient;
 
 	private final ProducerCustomConfig producerCustomConfig;
 
-	@SuppressWarnings("rawtypes")
 	private Map<String, Producer> producers = new ConcurrentHashMap<>();
 
 	public ProducerCollector(PulsarClient pulsarClient, ProducerCustomConfig producerCustomConfig) {
 		this.pulsarClient = pulsarClient;
 		this.producerCustomConfig = producerCustomConfig;
+		initProducers();
 	}
 
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) {
 		final Class<?> beanClass = bean.getClass();
+		// 注入用户spring 自定义配置
 		if (beanClass.isAnnotationPresent(PulsarProducer.class) && bean instanceof PulsarProducerFactory) {
 			producers.putAll(((PulsarProducerFactory) bean).getTopics().values().stream()
+					.filter($ -> !producers.containsKey($.getTopic()))
 					.collect(Collectors.toMap(ProducerHolder::getTopic, this::buildProducer)));
 		}
 		return bean;
 	}
 
-	@SuppressWarnings("rawtypes")
 	public Producer getProducer(String topic) {
 		return getProducerMap().get(topic);
 	}
 
-	@SuppressWarnings("rawtypes")
 	public void addProducer(String topic, Producer producer) {
 		if (StringUtils.isBlank(topic) || producer == null) {
 			return;
@@ -64,7 +65,10 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 		getProducerMap().put(topic, producer);
 	}
 
-	public void init() {
+	/**
+	 * 初始化yml生产者配置配置
+	 */
+	public void initProducers() {
 		// 覆盖 spring bean 配置得对象
 		Map<String, ProducerCustomDetailConfig> producersMap = producerCustomConfig.getProducer();
 		if (!CollectionUtils.isEmpty(producersMap)) {
@@ -92,36 +96,26 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	public <T> Producer getProducer(String topic, SendMessage<T> msg) {
 		return getProducer(topic, msg, null);
 	}
 
-	@SuppressWarnings("rawtypes")
 	public <T> Producer getProducer(String topic, SendMessage<T> msg, ProducerCustomDetailConfig config) {
+		// 获取yml,用户自定义配置
 		Producer producer = getProducer(topic);
 		if (producer != null) {
 			return producer;
 		}
+		// 获取默认配置
 		if (config == null) {
-			config = ProducerHolder.getDef(topic);
+			config = ProducerHolder.getDefConfig(topic);
 		}
 		producer = buildProducer(config);
 		addProducer(topic, producer);
 		return producer;
 	}
 
-	@SuppressWarnings("rawtypes")
 	public Map<String, Producer> getProducerMap() {
-		if (!CollectionUtils.isEmpty(producers)) {
-			return producers;
-		}
-		synchronized (producers) {
-			if (!CollectionUtils.isEmpty(producers)) {
-				return producers;
-			}
-			init();
-		}
 		return producers;
 	}
 

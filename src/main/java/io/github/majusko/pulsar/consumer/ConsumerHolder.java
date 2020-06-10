@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.CollectionUtils;
 
 import com.google.common.collect.Sets;
 
@@ -42,7 +41,7 @@ public class ConsumerHolder extends ConsumerCustomDetailConfig {
 	}
 
 	@SuppressWarnings("unchecked")
-	public ConsumerConfigurationDataExt getDef() {
+	public ConsumerConfigurationDataExt getDefConfig() {
 		ConsumerConfigurationDataExt configurationDataExt = new ConsumerConfigurationDataExt();
 		String name = bean.getClass().getSimpleName() + "#" + handler.getName();
 		configurationDataExt.setSubscriptionType(annotation.subscriptionType());
@@ -52,17 +51,28 @@ public class ConsumerHolder extends ConsumerCustomDetailConfig {
 		return configurationDataExt;
 	}
 
-	@SuppressWarnings("unchecked")
 	public ConsumerConfigurationDataExt getConfig() {
-		if (super.getConfig() != null) {
-			return super.getConfig();
+		ConsumerConfigurationDataExt configurationDataExt = super.getConfig();
+		// 优先加载yml种配置
+		if (configurationDataExt != null) {
+			return configurationDataExt;
+		}
+		// 注解配置
+		configurationDataExt = builderConfig(annotation);
+		if (configurationDataExt != null) {
+			return configurationDataExt;
 		}
 		// 默认配置
-		ConsumerConfigurationDataExt def = getDef();
+		configurationDataExt = getDefConfig();
+		return configurationDataExt;
+	}
+
+	public ConsumerConfigurationDataExt builderConfig(PulsarConsumer annotation) {
 		if (annotation == null || ArrayUtils.isEmpty(annotation.configuration())) {
-			return def;
+			return null;
 		}
 		try {
+			ConsumerConfigurationDataExt def = getDefConfig();
 			// 注解配置
 			Class<?> clazz = annotation.configuration()[0];
 			Optional<Method> findFirst = Arrays.stream(clazz.getDeclaredMethods())
@@ -73,8 +83,8 @@ public class ConsumerHolder extends ConsumerCustomDetailConfig {
 			Object newInstance = clazz.newInstance();
 			ConsumerConfigurationDataExt configurationDataExt = (ConsumerConfigurationDataExt) findFirst.get()
 					.invoke(newInstance);
-			if (CollectionUtils.isEmpty(configurationDataExt.getTopicNames())) {
-				configurationDataExt.setTopicNames(def.getTopicNames());
+			if (StringUtils.isBlank(configurationDataExt.getTopic())) {
+				configurationDataExt.setTopic(def.getTopic());
 			}
 			if (StringUtils.isBlank(configurationDataExt.getConsumerName())) {
 				configurationDataExt.setConsumerName(def.getConsumerName());
@@ -89,8 +99,7 @@ public class ConsumerHolder extends ConsumerCustomDetailConfig {
 		} catch (Exception e) {
 			log.error("getConfigException", e);
 		}
-
-		return def;
+		return null;
 	}
 
 	public PulsarConsumer getAnnotation() {
