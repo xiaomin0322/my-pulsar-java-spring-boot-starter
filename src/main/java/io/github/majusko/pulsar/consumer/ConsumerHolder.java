@@ -8,8 +8,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 
-import com.google.common.collect.Sets;
-
 import io.github.majusko.pulsar.annotation.PulsarConsumer;
 import io.github.majusko.pulsar.config.ConsumerConfigurationDataExt;
 import io.github.majusko.pulsar.config.ConsumerCustomDetailConfig;
@@ -40,14 +38,13 @@ public class ConsumerHolder extends ConsumerCustomDetailConfig {
 		BeanUtils.copyProperties(config, this);
 	}
 
-	@SuppressWarnings("unchecked")
 	public ConsumerConfigurationDataExt getDefConfig() {
 		ConsumerConfigurationDataExt configurationDataExt = new ConsumerConfigurationDataExt();
 		String name = bean.getClass().getSimpleName() + "#" + handler.getName();
 		configurationDataExt.setSubscriptionType(annotation.subscriptionType());
 		configurationDataExt.setConsumerName("consumer-" + name);
 		configurationDataExt.setSubscriptionName("subscription-" + name);
-		configurationDataExt.setTopicNames(Sets.newHashSet(annotation.topic()));
+		configurationDataExt.setTopic(annotation.topic());
 		return configurationDataExt;
 	}
 

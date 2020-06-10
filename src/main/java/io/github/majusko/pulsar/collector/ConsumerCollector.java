@@ -29,6 +29,9 @@ public class ConsumerCollector implements BeanPostProcessor, CommandLineRunner {
 	@Autowired
 	private ConsumerCustomConfig consumerCustomConfig;
 
+	/**
+	 * 加载注解配置
+	 */
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) {
 		final Class<?> beanClass = bean.getClass();
@@ -45,10 +48,13 @@ public class ConsumerCollector implements BeanPostProcessor, CommandLineRunner {
 		if (method == null) {
 			return builder.toString();
 		}
-		builder.append(className).append(method.getName());
+		builder.append(className).append("#").append(method.getName());
 		return builder.toString();
 	}
 
+	/**
+	 * 加载yml配置
+	 */
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		if (CollectionUtils.isEmpty(consumerCustomConfig.getConsumer())) {

@@ -1,6 +1,5 @@
 package io.github.majusko.pulsar;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import io.github.majusko.pulsar.constant.Serialization;
