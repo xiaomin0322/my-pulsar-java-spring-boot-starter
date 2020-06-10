@@ -68,35 +68,3 @@ public class ConsumerBuilder {
 		return consumers;
 	}
 }
-
-class ConsumerMessageListener<T> implements MessageListener<T> {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	ConsumerHolder holder;
-
-	public ConsumerMessageListener(ConsumerHolder holder) {
-		this.holder = holder;
-	}
-
-	@Override
-	public void received(Consumer<T> consumer, Message<T> msg) {
-		try {
-			final Method method = holder.getHandler();
-			Class<?> returnType = method.getParameterTypes()[0];
-			Object value = msg.getValue();
-			if (!returnType.equals(value.getClass())) {
-				value = ConsumeMessage.parse(msg);
-			}
-			method.setAccessible(true);
-			method.invoke(holder.getBean(), value);
-			consumer.acknowledge(msg);
-		} catch (Exception e) {
-			consumer.negativeAcknowledge(msg);
-			throw new PulsarRuntimeException("TODO Custom Exception!", e);
-		}
-
-	}
-
-}
