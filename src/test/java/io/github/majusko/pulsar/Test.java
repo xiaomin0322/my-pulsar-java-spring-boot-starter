@@ -26,6 +26,11 @@ public class Test {
 		
 	}
 	
+	@org.junit.Test
+	public void testA() {
+		System.out.println("=============");
+	}
+	
 	public void test(String s) {
 		
 	}

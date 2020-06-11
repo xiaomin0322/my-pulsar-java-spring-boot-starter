@@ -12,7 +12,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import io.github.majusko.pulsar.annotation.PulsarConsumer;
@@ -21,8 +21,9 @@ import io.github.majusko.pulsar.config.ConsumerCustomDetailConfig;
 import io.github.majusko.pulsar.consumer.ConsumerHolder;
 import lombok.extern.slf4j.Slf4j;
 
-@Configuration
+
 @Slf4j
+@Component
 public class ConsumerCollector implements BeanPostProcessor, CommandLineRunner {
 
 	private Map<String, ConsumerHolder> consumers = new ConcurrentHashMap<>();

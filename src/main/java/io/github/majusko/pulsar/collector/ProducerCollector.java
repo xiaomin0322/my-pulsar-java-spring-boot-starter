@@ -92,7 +92,7 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 				newProducer.loadConf(ConfigurationDataUtils.toMap(config, ProducerConfigurationDataExt.class));
 			}
 			return newProducer.topic(holder.getTopic()).create();
-		} catch (PulsarClientException e) {
+		} catch (Exception e) {
 			throw new PulsarRuntimeException("TODO Custom Exception!", e);
 		}
 	}
