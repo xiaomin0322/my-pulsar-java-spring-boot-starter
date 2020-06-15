@@ -24,6 +24,26 @@ public class ProducerTest {
 		System.out.println("=========" + send.isSucceed());
 		Thread.sleep(10000);
 	}
+	
+	@Test
+	public void testProducerSendMethodSendMessage2() throws Exception {
+		SendMessage<MyMsg> message = new SendMessage<>(new MyMsg("asdasd"));
+		SendResult send = producer.send("persistent://dominos_dev/pe/topic-zzm2", message);
+		System.out.println("=========" + send.isSucceed());
+		Thread.sleep(10000);
+	}
+	
+	/**
+	 * tenant ,namespace不能自动创建。只有topic可以自动创建
+	 * @throws Exception
+	 */
+	@Test
+	public void testProducerSendMethodSendMessage3() throws Exception {
+		SendMessage<MyMsg> message = new SendMessage<>(new MyMsg("asdasd"));
+		SendResult send = producer.send("persistent://dominos_dev/pe/topic-zzm100", message);
+		System.out.println("=========" + send.isSucceed());
+		Thread.sleep(10000);
+	}
 
 	@Test
 	public void testProducerSendMethodSendMessage() throws Exception {
