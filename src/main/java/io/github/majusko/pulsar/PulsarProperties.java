@@ -1,12 +1,19 @@
 package io.github.majusko.pulsar;
 
+import org.apache.pulsar.client.impl.conf.ClientConfigurationData;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @ConfigurationProperties(prefix = "pulsar.client")
-@Data
-public class PulsarProperties {
+@Getter
+@Setter
+public class PulsarProperties extends ClientConfigurationData {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String serviceUrl = "pulsar://localhost:6650";
 	private Integer ioThreads = 10;
 	private Integer listenerThreads = 10;
