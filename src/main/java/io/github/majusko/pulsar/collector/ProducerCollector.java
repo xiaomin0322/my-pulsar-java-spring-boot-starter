@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.client.api.Producer;
 import org.apache.pulsar.client.api.ProducerBuilder;
 import org.apache.pulsar.client.api.PulsarClient;
-import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.Schema;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.CommandLineRunner;
@@ -19,6 +18,7 @@ import io.github.majusko.pulsar.annotation.PulsarProducer;
 import io.github.majusko.pulsar.config.ProducerConfigurationDataExt;
 import io.github.majusko.pulsar.config.ProducerCustomConfig;
 import io.github.majusko.pulsar.config.ProducerCustomDetailConfig;
+import io.github.majusko.pulsar.constant.Constants;
 import io.github.majusko.pulsar.exception.PulsarRuntimeException;
 import io.github.majusko.pulsar.producer.ProducerHolder;
 import io.github.majusko.pulsar.producer.PulsarProducerFactory;
@@ -74,6 +74,7 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 		Map<String, ProducerCustomDetailConfig> producersMap = producerCustomConfig.getProducer();
 		if (!CollectionUtils.isEmpty(producersMap)) {
 			producers.putAll(producersMap.values().stream()
+					.filter($ ->  !producersMap.containsKey(Constants.DEF_PROD_CONF_KEY))
 					.collect(Collectors.toMap(ProducerCustomDetailConfig::getTopic, this::buildProducer)));
 		}
 	}
@@ -107,9 +108,9 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 		if (producer != null) {
 			return producer;
 		}
-		// 获取默认配置
+		// 获取编码默认配置
 		if (config == null) {
-			config = ProducerHolder.getDefConfig(topic,msg.getValue());
+			config = ProducerHolder.getDefConfig(topic, msg.getValue(), producerCustomConfig.getProducer());
 		}
 		producer = buildProducer(config);
 		addProducer(topic, producer);
