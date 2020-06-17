@@ -1,16 +1,3 @@
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 package io.github.majusko.pulsar.producer;
 
@@ -20,13 +7,31 @@ import java.util.concurrent.ExecutionException;
 import org.apache.pulsar.client.api.MessageId;
 
 /**
- * Created zzm
+ * 
+ * 消息返回对象
+ *
+ * @author Zengmin.Zhang
+ *
  */
 public class SendResult {
 
+	/**
+	 * 状态码
+	 */
 	private int code;
-	private String msgId;
+
+	/**
+	 * 状态信息
+	 */
 	private String msg;
+	/**
+	 * 消息ID
+	 */
+	private String msgId;
+
+	/**
+	 * 异步返回对象
+	 */
 	private CompletableFuture<MessageId> sendAsync;
 
 	public SendResult(CompletableFuture<MessageId> sendAsync) {
@@ -97,7 +102,7 @@ public class SendResult {
 	public static SendResult FAILURE_NOTRUNNING = new SendResult(401, "client状态不是running");
 	public static SendResult FAILURE_TIMEOUT = new SendResult(402, "客户端发送超时");
 	public static SendResult FAILURE_INTERUPRION = new SendResult(403, "等待线程被中断");
-	public static SendResult FAILURE = new SendResult(404, "slave节点不存在");
+	public static SendResult FAILURE = new SendResult(404, "发送消息失败");
 	public static SendResult FAILURE_NULL = new SendResult(400, "参数为NULL");
 
 	public static SendResult buildErrorResult(String msg) {

@@ -7,29 +7,47 @@ import java.util.concurrent.TimeUnit;
 import io.github.majusko.pulsar.producer.SendType;
 
 /**
- * Created by zzm
+ * 消息发送包装类
+ * 
+ * @author Zengmin.Zhang
+ *
+ * @param <T>
  */
 public class SendMessage<T> {
-	// 排序和分片key
+	/**
+	 * 排序和分片key
+	 */
 	private String key;
 
 	private String tags;
 
-	// 延迟多久
+	/**
+	 * 延迟时间
+	 */
 	private Long delay;
-	// 延迟单位
+	/**
+	 * 延迟单位 默认是秒
+	 */
 	private TimeUnit delayTimeUnit = TimeUnit.SECONDS;
 
-	// 消息体
+	/**
+	 * 消息体对象
+	 */
 	private T value;
 
-	// 同步，异步和oneway
+	/**
+	 * 同步，异步和oneway
+	 */
 	private SendType sendType = SendType.SYNC;
 
-	// 消息属性列表
+	/**
+	 * 消息属性列表
+	 */
 	private Map<String, String> properties;
 
-	// 唯一ID
+	/**
+	 * 唯一ID
+	 */
 	private Long sequenceId;
 
 	public SendMessage() {

@@ -12,9 +12,12 @@ import org.springframework.util.CollectionUtils;
 
 import io.github.majusko.pulsar.collector.ProducerCollector;
 import io.github.majusko.pulsar.config.ProducerCustomDetailConfig;
+import io.github.majusko.pulsar.exception.PulsarRuntimeException;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @SuppressWarnings("unchecked")
+@Slf4j
 public class PulsarTemplate {
 
 	private final ProducerCollector producerCollector;
@@ -23,38 +26,95 @@ public class PulsarTemplate {
 		this.producerCollector = producerCollector;
 	}
 
-	public <T> SendResult send(String topic, T msg) throws PulsarClientException {
+	/**
+	 * 
+	 * 发送消息
+	 * 
+	 * @param topic topic名称
+	 * @param msg   消息对象
+	 * @return SendResult
+	 * @throws PulsarRuntimeException
+	 */
+	public <T> SendResult send(String topic, T msg) throws PulsarRuntimeException {
 		return send(topic, new SendMessage<T>(msg));
 	}
 
-	public <T> SendResult send(String topic, T msg, ProducerCustomDetailConfig config) throws PulsarClientException {
+	/**
+	 * 发现消息
+	 * 
+	 * @param topic  topic名称
+	 * @param msg    消息对象
+	 * @param config 自定义配置对象
+	 * @return SendResult
+	 * @throws PulsarRuntimeException
+	 */
+	public <T> SendResult send(String topic, T msg, ProducerCustomDetailConfig config) throws PulsarRuntimeException {
 		return send(topic, new SendMessage<T>(msg), config);
 	}
 
-	public <T> SendResult send(String topic, SendMessage<T> msg) throws PulsarClientException {
+	/**
+	 * 发现消息
+	 * 
+	 * @param topic topic名称
+	 * @param msg   消息对象
+	 * @return SendResult
+	 * @throws PulsarRuntimeException
+	 */
+	public <T> SendResult send(String topic, SendMessage<T> msg) throws PulsarRuntimeException {
 		return send(producerCollector.getProducer(topic, msg), msg);
 	}
 
+	/**
+	 * 发送消息
+	 * 
+	 * @param topic  topic名称
+	 * @param msg    消息对象
+	 * @param config 自定义配置对象
+	 * @return SendResult
+	 * @throws PulsarRuntimeException
+	 */
 	public <T> SendResult send(String topic, SendMessage<T> msg, ProducerCustomDetailConfig config)
-			throws PulsarClientException {
+			throws PulsarRuntimeException {
 		return send(producerCollector.getProducer(topic, msg, config), msg);
 	}
 
-	private <T> SendResult check(Producer<T> producer, SendMessage<T> msg) throws PulsarClientException {
+	/**
+	 * 检查消息
+	 * 
+	 * @param producer 发送者对象
+	 * @param msg      消息对象
+	 * @return SendResult
+	 * @throws PulsarRuntimeException
+	 */
+	private <T> SendResult check(Producer<T> producer, SendMessage<T> msg) throws PulsarRuntimeException {
 		if (producer == null || msg == null || msg.getValue() == null) {
 			return SendResult.FAILURE_NULL;
 		}
 		return SendResult.SUCCESS;
 	}
 
-	private <T> SendResult send(Producer<T> producer, SendMessage<T> msg) throws PulsarClientException {
+	/**
+	 * 发送消息
+	 * 
+	 * @param producer 发送者
+	 * @param msg      消息试提
+	 * @return
+	 * @throws PulsarRuntimeException
+	 */
+	private <T> SendResult send(Producer<T> producer, SendMessage<T> msg) throws PulsarRuntimeException {
 		SendResult checkSendResult = check(producer, msg);
 		if (!checkSendResult.isSucceed()) {
 			return checkSendResult;
 		}
 		TypedMessageBuilder<T> messageBuilder = messageBuilder(producer, msg);
 		if (SendType.SYNC == msg.getSendType()) {
-			MessageId msgID = messageBuilder.send();
+			MessageId msgID = null;
+			try {
+				msgID = messageBuilder.send();
+			} catch (PulsarClientException e) {
+				log.error("sendException", e);
+				throw new PulsarRuntimeException("sendException", e);
+			}
 			return SendResult.getSendResult(msgID);
 		} else {
 			CompletableFuture<MessageId> sendAsync = messageBuilder.sendAsync();
@@ -64,6 +124,13 @@ public class PulsarTemplate {
 
 	}
 
+	/**
+	 * 构建消息
+	 * 
+	 * @param producer 发送者
+	 * @param msg      消息对象
+	 * @return
+	 */
 	private <T> TypedMessageBuilder<T> messageBuilder(Producer<T> producer, SendMessage<T> msg) {
 		TypedMessageBuilder<T> messageBuilder = producer.newMessage();
 		if (StringUtils.isNotBlank(msg.getKey())) {
