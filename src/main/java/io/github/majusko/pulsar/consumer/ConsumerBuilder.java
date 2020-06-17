@@ -9,11 +9,14 @@ import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.PulsarClient;
 import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.Schema;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import io.github.majusko.pulsar.collector.ConsumerCollector;
 import io.github.majusko.pulsar.config.ConsumerConfigurationDataExt;
+import io.github.majusko.pulsar.config.ConsumerCustomConfig;
+import io.github.majusko.pulsar.constant.Constants;
 import io.github.majusko.pulsar.exception.PulsarRuntimeException;
 import io.github.majusko.pulsar.util.ConfigurationDataUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,9 @@ public class ConsumerBuilder {
 	private final PulsarClient pulsarClient;
 
 	private List<Consumer> consumers;
+	
+	@Autowired
+	private ConsumerCustomConfig consumerCustomConfig;
 
 	public ConsumerBuilder(ConsumerCollector consumerCollector, PulsarClient pulsarClient) {
 		this.consumerCollector = consumerCollector;
@@ -37,6 +43,7 @@ public class ConsumerBuilder {
 	@PostConstruct
 	private void init() {
 		consumers = consumerCollector.getConsumers().entrySet().stream()
+				.filter($ -> !$.getKey().contains(Constants.DEF_CONS_CONF_KEY))
 				.map(holder -> subscribe(holder.getKey(), holder.getValue())).collect(Collectors.toList());
 	}
 
@@ -44,7 +51,7 @@ public class ConsumerBuilder {
 		try {
 			Schema<?> schema = holder.schema();
 			org.apache.pulsar.client.api.ConsumerBuilder<?> consumerBuilder = pulsarClient.newConsumer(schema);
-			ConsumerConfigurationDataExt config = holder.getConfig();
+			ConsumerConfigurationDataExt config = holder.getConfig(consumerCustomConfig.getConsumer());
 			if (config != null) {
 				consumerBuilder = consumerBuilder
 						.loadConf(ConfigurationDataUtils.toMap(config, ConsumerConfigurationDataExt.class));

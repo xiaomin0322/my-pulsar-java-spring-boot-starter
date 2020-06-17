@@ -2,6 +2,7 @@ package io.github.majusko.pulsar.producer;
 
 import java.util.Map;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
 import io.github.majusko.pulsar.config.ProducerCustomDetailConfig;
@@ -21,9 +22,10 @@ public class ProducerHolder extends ProducerCustomDetailConfig {
 
 	public static <T> ProducerCustomDetailConfig getDefConfig(String topic, T t,
 			Map<String, ProducerCustomDetailConfig> configMap) {
-		ProducerCustomDetailConfig producerCustomDetailConfig = null;
+		ProducerCustomDetailConfig producerCustomDetailConfig = new ProducerCustomDetailConfig();
 		if (!CollectionUtils.isEmpty(configMap)) {
-			producerCustomDetailConfig = configMap.get(Constants.DEF_PROD_CONF_KEY);
+			ProducerCustomDetailConfig defConfig = configMap.get(Constants.DEF_PROD_CONF_KEY);
+			BeanUtils.copyProperties(defConfig, producerCustomDetailConfig);
 		}
 		producerCustomDetailConfig = getDefConfig(topic, t, producerCustomDetailConfig);
 		return producerCustomDetailConfig;

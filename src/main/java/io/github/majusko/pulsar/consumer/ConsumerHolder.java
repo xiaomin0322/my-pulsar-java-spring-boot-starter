@@ -2,15 +2,18 @@ package io.github.majusko.pulsar.consumer;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.CollectionUtils;
 
 import io.github.majusko.pulsar.annotation.PulsarConsumer;
 import io.github.majusko.pulsar.config.ConsumerConfigurationDataExt;
 import io.github.majusko.pulsar.config.ConsumerCustomDetailConfig;
+import io.github.majusko.pulsar.constant.Constants;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -52,8 +55,16 @@ public class ConsumerHolder extends ConsumerCustomDetailConfig {
 		BeanUtils.copyProperties(config, this);
 	}
 
-	public ConsumerConfigurationDataExt getDefConfig() {
+	public ConsumerConfigurationDataExt getDefConfig(Map<String, ConsumerCustomDetailConfig> consumerMap) {
+		ConsumerCustomDetailConfig consumerCustomDetailConfig = null;
+		if (!CollectionUtils.isEmpty(consumerMap)) {
+			consumerCustomDetailConfig = consumerMap.get(Constants.DEF_CONS_CONF_KEY);
+		}
 		ConsumerConfigurationDataExt configurationDataExt = new ConsumerConfigurationDataExt();
+		if (consumerCustomDetailConfig != null) {
+			ConsumerConfigurationDataExt defConfig = consumerCustomDetailConfig.getConfig();
+			BeanUtils.copyProperties(defConfig, configurationDataExt);
+		}
 		String name = bean.getClass().getSimpleName() + "#" + handler.getName();
 		configurationDataExt.setSubscriptionType(annotation.subscriptionType());
 		configurationDataExt.setConsumerName("consumer-" + name);
@@ -62,7 +73,7 @@ public class ConsumerHolder extends ConsumerCustomDetailConfig {
 		return configurationDataExt;
 	}
 
-	public ConsumerConfigurationDataExt getConfig() {
+	public ConsumerConfigurationDataExt getConfig(Map<String, ConsumerCustomDetailConfig> consumerMap) {
 		ConsumerConfigurationDataExt configurationDataExt = super.getConfig();
 		// 优先加载yml种配置
 		if (configurationDataExt != null) {
@@ -74,16 +85,22 @@ public class ConsumerHolder extends ConsumerCustomDetailConfig {
 			return configurationDataExt;
 		}
 		// 默认配置
-		configurationDataExt = getDefConfig();
+		configurationDataExt = getDefConfig(consumerMap);
 		return configurationDataExt;
 	}
 
+	/**
+	 * 从注解中构造配置类
+	 * 
+	 * @param annotation
+	 * @return
+	 */
 	public ConsumerConfigurationDataExt builderConfig(PulsarConsumer annotation) {
 		if (annotation == null || ArrayUtils.isEmpty(annotation.configuration())) {
 			return null;
 		}
 		try {
-			ConsumerConfigurationDataExt def = getDefConfig();
+			ConsumerConfigurationDataExt def = getDefConfig(null);
 			// 注解配置
 			Class<?> clazz = annotation.configuration()[0];
 			Optional<Method> findFirst = Arrays.stream(clazz.getDeclaredMethods())

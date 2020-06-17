@@ -12,7 +12,7 @@ public class TestConsumerConfiguration {
 	@Autowired
 	TestService testService;
 
-	@PulsarConsumer(topic = "topic-zzm", clazz = MyMsg.class)
+	@PulsarConsumer(topic = "topic-zzm2", clazz = MyMsg.class)
 	public void topicOneTheListener(MyMsg myMsg) {
 		System.out.println("=============================" + myMsg.getData());
 		//Assertions.assertNotNull(myMsg);
