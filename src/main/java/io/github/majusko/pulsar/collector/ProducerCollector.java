@@ -74,7 +74,7 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 		Map<String, ProducerCustomDetailConfig> producersMap = producerCustomConfig.getProducer();
 		if (!CollectionUtils.isEmpty(producersMap)) {
 			producers.putAll(producersMap.values().stream()
-					.filter($ ->  !producersMap.containsKey(Constants.DEF_PROD_CONF_KEY))
+					.filter($ ->  $.getTopic()!=null)
 					.collect(Collectors.toMap(ProducerCustomDetailConfig::getTopic, this::buildProducer)));
 		}
 	}
@@ -94,7 +94,7 @@ public class ProducerCollector implements BeanPostProcessor, CommandLineRunner {
 			}
 			return newProducer.topic(holder.getTopic()).create();
 		} catch (Exception e) {
-			throw new PulsarRuntimeException("TODO Custom Exception!", e);
+			throw new PulsarRuntimeException("TODO buildProducer Exception!", e);
 		}
 	}
 

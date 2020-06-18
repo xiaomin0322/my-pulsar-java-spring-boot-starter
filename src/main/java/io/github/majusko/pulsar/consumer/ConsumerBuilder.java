@@ -43,7 +43,7 @@ public class ConsumerBuilder {
 	@PostConstruct
 	private void init() {
 		consumers = consumerCollector.getConsumers().entrySet().stream()
-				.filter($ -> !$.getKey().contains(Constants.DEF_CONS_CONF_KEY))
+				.filter($ -> Constants.DEF_CONS_CONF_KEY.equals($.getKey()))
 				.map(holder -> subscribe(holder.getKey(), holder.getValue())).collect(Collectors.toList());
 	}
 
