@@ -36,7 +36,7 @@ public class SendMessage<T> {
 	private T value;
 
 	/**
-	 * 同步，异步和oneway
+	 * 同步，异步  默认同步
 	 */
 	private SendType sendType = SendType.SYNC;
 

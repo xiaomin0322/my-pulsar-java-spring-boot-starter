@@ -30,14 +30,10 @@ public class SendResult {
 	private String msgId;
 
 	/**
-	 * 异步返回对象
+	 * 获取异步赶回结果
+	 * 
+	 * @return SendResult
 	 */
-	private CompletableFuture<MessageId> sendAsync;
-
-	public SendResult(CompletableFuture<MessageId> sendAsync) {
-		this.sendAsync = sendAsync;
-	}
-
 	public SendResult getAsyncResult() {
 		try {
 			MessageId messageId = sendAsync.get();
@@ -46,6 +42,15 @@ public class SendResult {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	/**
+	 * 异步返回对象
+	 */
+	private CompletableFuture<MessageId> sendAsync;
+
+	public SendResult(CompletableFuture<MessageId> sendAsync) {
+		this.sendAsync = sendAsync;
 	}
 
 	public static SendResult getSendResult(MessageId messageId) {
@@ -113,6 +118,10 @@ public class SendResult {
 		return new SendResult(code, msg);
 	}
 
+	/**
+	 *      是否发送成功
+	 * @return
+	 */
 	public boolean isSucceed() {
 		return this.code == 200;
 	}
