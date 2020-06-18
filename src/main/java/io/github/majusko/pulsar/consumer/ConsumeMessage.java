@@ -63,6 +63,9 @@ public class ConsumeMessage<T> {
 	 */
 	private long sequenceId;
 
+	/**
+	 * 消息额外属性map
+	 */
 	private Map<String, String> properties;
 
 	
