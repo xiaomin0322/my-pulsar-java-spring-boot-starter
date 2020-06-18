@@ -20,7 +20,7 @@ public class ProducerTest {
 
 	@Test
 	public void testProducerSendMethod() throws Exception {
-		SendResult send = producer.send("topic-zzm2", new MyMsg("asdasd"));
+		SendResult send = producer.send("topic-zzm2", new MyMsg("asdasd1111111111111111"));
 		System.out.println("=========" + send.isSucceed());
 		Thread.sleep(10000);
 	}
