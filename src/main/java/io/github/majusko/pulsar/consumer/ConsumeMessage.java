@@ -14,90 +14,75 @@
 
 package io.github.majusko.pulsar.consumer;
 
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.pulsar.client.api.Message;
 import org.springframework.beans.BeanUtils;
 
+import lombok.Data;
+
 /**
- * Created by zzm
+ * 消费者消息封装实体类
  */
+
+@Data
 public class ConsumeMessage<T> {
 
+	/**
+	 * topic名称
+	 */
 	private String topicName;
 
+	/**
+	 * 消息路由KEY
+	 */
 	private String key;
 
+	/**
+	 * 消息实体对象
+	 */
 	private T value;
 
+	/**
+	 * 消息ID
+	 */
 	private String messageId;
 
+	/**
+	 * 
+	 */
 	private long eventTime;
 
+	/**
+	 * 
+	 */
 	private long publishTime;
 
-	private Properties properties = new Properties();
+	/**
+	 * 消息唯一ID
+	 */
+	private long sequenceId;
 
-	public Properties getProperties() {
-		return properties;
-	}
+	private Map<String, String> properties;
 
-	public void setProperties(Properties properties) {
-		this.properties = properties;
-	}
-
+	
+	/**
+	 * 转换
+	 * @param pulsarMsg
+	 * @return
+	 */
 	public static <T> ConsumeMessage<T> parse(Message<T> pulsarMsg) {
 		ConsumeMessage<T> message = new ConsumeMessage<T>();
 		BeanUtils.copyProperties(pulsarMsg, message);
+		message.setEventTime(pulsarMsg.getEventTime());
+		message.setPublishTime(pulsarMsg.getPublishTime());
+		message.setKey(pulsarMsg.getKey());
+		message.setProperties(pulsarMsg.getProperties());
+		message.setTopicName(pulsarMsg.getTopicName());
+		message.setValue(pulsarMsg.getValue());
+		message.setMessageId(pulsarMsg.getMessageId().toString());
+		message.setSequenceId(pulsarMsg.getSequenceId());
 		return message;
-	}
-
-	public String getTopicName() {
-		return topicName;
-	}
-
-	public void setTopicName(String topicName) {
-		this.topicName = topicName;
-	}
-
-	public String getKey() {
-		return key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
-	}
-
-	public T getValue() {
-		return value;
-	}
-
-	public void setValue(T value) {
-		this.value = value;
-	}
-
-	public String getMessageId() {
-		return messageId;
-	}
-
-	public void setMessageId(String messageId) {
-		this.messageId = messageId;
-	}
-
-	public long getEventTime() {
-		return eventTime;
-	}
-
-	public void setEventTime(long eventTime) {
-		this.eventTime = eventTime;
-	}
-
-	public long getPublishTime() {
-		return publishTime;
-	}
-
-	public void setPublishTime(long publishTime) {
-		this.publishTime = publishTime;
 	}
 
 }
