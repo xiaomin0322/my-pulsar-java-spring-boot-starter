@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import io.github.majusko.pulsar.collector.ConsumerCollector;
 import io.github.majusko.pulsar.config.ConsumerConfigurationDataExt;
 import io.github.majusko.pulsar.config.ConsumerCustomConfig;
-import io.github.majusko.pulsar.constant.Constants;
 import io.github.majusko.pulsar.exception.PulsarRuntimeException;
 import io.github.majusko.pulsar.util.ConfigurationDataUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +42,6 @@ public class ConsumerBuilder {
 	@PostConstruct
 	private void init() {
 		consumers = consumerCollector.getConsumers().entrySet().stream()
-				.filter($ -> Constants.DEF_CONS_CONF_KEY.equals($.getKey()))
 				.map(holder -> subscribe(holder.getKey(), holder.getValue())).collect(Collectors.toList());
 	}
 
